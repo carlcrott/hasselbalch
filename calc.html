@@ -3,6 +3,19 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script>
         $(document).ready(function() {
+
+
+            //// Buffer System Attributes:
+            // Change these to update the values which are placed in the input boxes
+            // Values must match exact names in the #buffer_system dropdown
+
+            var bufferSystemAttributes = {
+                "Tris":                 [8.214,  "Tris-HCl",      157.59,  "g/mol",   "Tris-OH",      121.136,    "g/mol"],
+                "Ammonium acetate 1":   [9.25,   "Acetic acid",   60.05,   "g/mol",   "NH4-acetate",  77.0825,    "g/mol"],
+                "Ammonium acetate 2":   [4.47,   "Acetic acid",   60.05,   "g/mol",   "NH4-acetate",  77.0825,    "g/mol"],
+                "Sodium phosphate":     [6.82,   "NaH2PO4",       119.98,  "g/mol",   "Na2HPO4",      141.96,     "g/mol"],
+            }
+
             function log10(val) {
               return Math.log(val) / Math.LN10;
             }
@@ -10,18 +23,33 @@
             function hendersonHasselbalch() {
                 calc_coeff = parseFloat( $("#hh_coeff").val() );
                 calc_exp = parseFloat( $("#hh_exp").val() );
-                calc_base = parseFloat( $("#hh_base").val() );
-                calc_acid = parseFloat( $("#hh_acid").val() );
+                calc_base = parseFloat( $("#hh_base_mw").val() );
+                calc_acid = parseFloat( $("#hh_acid_mw").val() );
 
-                pKa = -log10( calc_coeff * Math.pow(10, calc_exp) ) ;
-                console.log( pKa );
+                // Get pKa from bufferSystemAttributes using the name of the buffer system
+                bufferSystemName = $("select#buffer_system").val()
+                pKa = bufferSystemAttributes[bufferSystemName][0];
+                console.log("pKa: " + pKa );
 
+                // pH = pKa + log_10( base / acid )
+                // pH = pKa + log_10( 0.025 / 0.0025 )
+                // Math.log(Math.pow(10, -7)*4.2)/Math.log(10)
+                // -Math.log(Math.pow(10, -7)*4.2)/Math.log(10) + ( Math.log(0.025/0.0025) /Math.log(10) )
                 acid_base = log10( calc_base / calc_acid );
-                console.log( acid_base );
+                console.log("acid_base: " + acid_base );
 
                 output_ph = pKa + acid_base
 
-                $("#hh_ph").val( output_ph );
+//                $("#results").find('input').css('background-color','red').setTimeout(function(){
+//                    $("#results").find('input').css('background-color','white')                    
+//                }, 1000);
+
+
+                // Write out required mass for
+                $("#hh_req_acid_mass").val( output_ph );
+                $("#hh_req_base_mass").val( output_ph );
+
+
             }
 
             $("#hh_run").on('click', hendersonHasselbalch );
@@ -40,17 +68,38 @@
 
             $("#custom_toggle").on('click', toggleDisabled );
 
+            function updateBufferSystemAttributes () {
+                bufferSystemName = $("select#buffer_system").val()
+                console.log(bufferSystemName);
+                
+                $("#hh_acid").val(bufferSystemAttributes[bufferSystemName][1]);
+                $("#hh_acid_mw").val(bufferSystemAttributes[bufferSystemName][2]);
+                $("#hh_acid_mw_units").val(bufferSystemAttributes[bufferSystemName][3]);
+
+                $("#hh_base").val(bufferSystemAttributes[bufferSystemName][4]);
+                $("#hh_base_mw").val(bufferSystemAttributes[bufferSystemName][5]);
+                $("#hh_base_mw_units").val(bufferSystemAttributes[bufferSystemName][6]);
+
+            }
+
+            // On changing the buffer system update the buffer attributes
+            $("#buffer_system").on('change', updateBufferSystemAttributes);
+            
+
+
+
         });
     </script>
 
     <style type="text/css">
-        input:not([type]), input[type="text"]{
+        input[type="text"]{
             width:80px;
         }
         .tg  {border-collapse:collapse;border-spacing:0;}
-        .tg td, th{
+        .tg td, th {
             font-family:Arial, sans-serif;font-size:14px;font-weight:normal;
             padding:10px 5px;
+            text-align: center;
             border: 1px solid lightgrey;
             overflow:hidden;word-break:normal;}
     </style>
@@ -60,47 +109,51 @@
 
 <body>
 
-<!--pH = pKa + log_10( base / acid )-->
-<!-- Acid                     Acid Mw            Base               Base Mw            pKa-->
-
 <input type="checkbox" name="custom" value="custom" id="custom_toggle"> Enter custom values
 
 <table class="tg">
   <tr id="buffer_system">
     <th class="tg-031e">
 
-    buffer system:
-    <select id="BufferSystem">
-        <option>Sodium Phosphate</option>
+    buffer system: <br />
+    <select id="buffer_system">
+        <option>Sodium phosphate</option>
         <option>Tris</option>
     </select>
+    <br />
 
     </th>
     <th class="tg-031e">
-        acid: <input type="text" id="hh_acid" value="NaH2PO4" disabled="disabled"><br />
+        acid:<br />
+<!--        <input type="text" id="hh_acid" value="NaH2PO4" disabled="disabled"><br />-->
+        <input type="text" id="hh_acid" value="NaH2PO4" disabled="disabled"><br />
     </th>
     <th class="tg-031e">
-        acid Mw: <input type="text" id="hh_acid_mw" value="119.98" disabled="disabled">g/mol<br />
+        acid Mw:<br />
+        <input type="text" id="hh_acid_mw" value="119.98" disabled="disabled"> <input type="text" id="hh_acid_mw_units" value="g/mol" disabled="disabled"><br />
     </th>
     <th class="tg-031e">
-        base: <input type="text" id="hh_base" value="NA2HPO4" disabled="disabled"><br />
+        base:<br />
+        <input type="text" id="hh_base" value="NA2HPO4" disabled="disabled"><br />
     </th>
     <th class="tg-031e">
-        base Mw: <input type="text" id="hh_base_mw" value="141.96" disabled="disabled">g/mol<br />
+        base Mw:<br />
+        <input type="text" id="hh_base_mw" value="141.96" disabled="disabled"> <input type="text" id="hh_base_mw_units" value="g/mol" disabled="disabled"> <br />
     </th>
   </tr>
+
   <tr>
     <td class="tg-031e">Enter your requirements:</td>
     <td class="tg-031e">
-        pH:
+        pH: <br />
         <input type="text" id="hh_req_ph">
     </td>
     <td class="tg-031e">
-        Concentration:
+        Concentration: <br />
         <input type="text" id="hh_conc_ph">
     </td>
     <td class="tg-031e">
-        Volume:
+        Volume: <br />
         <input type="text" id="hh_vol_ph">
 
     </td>
@@ -109,31 +162,21 @@
 
 </table>
 
-
-    
-
-    
-    
-
-<!--    pKa: <input type="text" id="hh_coeff" size="5">*10^<input type="text" id="hh_exp" size="5"> <br />    -->
-
 <p> &nbsp; </p>
-
-    <button id="hh_run">calculate</button><br />
-
+<button id="hh_run">calculate</button><br />
 <p> &nbsp; </p>
 
 
-<table>
+<table class="tg" id="results">
   <tr>
     <td class="tg-031e">Results: <br/> You need</td>
     <td class="tg-031e">
-        Acid mass:
-        <input type="text" id="hh_req_ph">
+        Acid mass:<br/>
+        <input type="text" id="hh_req_acid_mass">
     </td>
     <td class="tg-031e">
-        base mass:
-        <input type="text" id="hh_conc_ph">
+        base mass:<br/>
+        <input type="text" id="hh_req_base_mass">
     </td>
     <td class="tg-031e"></td>
     <td class="tg-031e"></td>

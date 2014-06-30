@@ -1,0 +1,45 @@
+<html>
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function log10(val) {
+              return Math.log(val) / Math.LN10;
+            }
+
+            function hendersonHasselbalch() {
+                calc_coeff = parseFloat( $("#hh_coeff").val() );
+                calc_exp = parseFloat( $("#hh_exp").val() );
+                calc_base = parseFloat( $("#hh_base").val() );
+                calc_acid = parseFloat( $("#hh_acid").val() );
+
+                pKa = -log10( calc_coeff * Math.pow(10, calc_exp) ) ;
+                console.log( pKa );
+
+                acid_base = log10( calc_base / calc_acid );
+                console.log( acid_base );
+
+                output_ph = pKa + acid_base
+
+                $("#hh_ph").val( output_ph );
+            }
+
+            $("#hh_run").on('click', hendersonHasselbalch );
+
+        });
+    </script>
+<head>
+
+
+<body>
+    Ka: <input type="text" id="hh_coeff" size="5">*10^<input type="text" id="hh_exp"  size="5"> <br />
+    base: <input type="text" id="hh_base"><br />
+    acid: <input type="text" id="hh_acid"><br />
+
+    <button id="hh_run">calculate</button><br />
+
+    pH: <input type="text" id="hh_ph"><br />
+
+</body>
+
+</html>
