@@ -1,0 +1,148 @@
+<html>
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            function log10(val) {
+              return Math.log(val) / Math.LN10;
+            }
+
+            function hendersonHasselbalch() {
+                calc_coeff = parseFloat( $("#hh_coeff").val() );
+                calc_exp = parseFloat( $("#hh_exp").val() );
+                calc_base = parseFloat( $("#hh_base").val() );
+                calc_acid = parseFloat( $("#hh_acid").val() );
+
+                pKa = -log10( calc_coeff * Math.pow(10, calc_exp) ) ;
+                console.log( pKa );
+
+                acid_base = log10( calc_base / calc_acid );
+                console.log( acid_base );
+
+                output_ph = pKa + acid_base
+
+                $("#hh_ph").val( output_ph );
+            }
+
+            $("#hh_run").on('click', hendersonHasselbalch );
+
+            function toggleDisabled() {
+                alert("Not Yet Implemented!");
+//                return this.each(function () {
+//                    var $this = $(this);
+//                    if ($this.prop('disabled')) {
+//                        $this.prop('disabled', false).show();
+//                    } else {
+//                        $this.prop('disabled', true).hide();
+//                    }
+//                });
+            }
+
+            $("#custom_toggle").on('click', toggleDisabled );
+
+        });
+    </script>
+
+    <style type="text/css">
+        input:not([type]), input[type="text"]{
+            width:80px;
+        }
+        .tg  {border-collapse:collapse;border-spacing:0;}
+        .tg td, th{
+            font-family:Arial, sans-serif;font-size:14px;font-weight:normal;
+            padding:10px 5px;
+            border: 1px solid lightgrey;
+            overflow:hidden;word-break:normal;}
+    </style>
+
+<head>
+
+
+<body>
+
+<!--pH = pKa + log_10( base / acid )-->
+<!-- Acid                     Acid Mw            Base               Base Mw            pKa-->
+
+<input type="checkbox" name="custom" value="custom" id="custom_toggle"> Enter custom values
+
+<table class="tg">
+  <tr id="buffer_system">
+    <th class="tg-031e">
+
+    buffer system:
+    <select id="BufferSystem">
+        <option>Sodium Phosphate</option>
+        <option>Tris</option>
+    </select>
+
+    </th>
+    <th class="tg-031e">
+        acid: <input type="text" id="hh_acid" value="NaH2PO4" disabled="disabled"><br />
+    </th>
+    <th class="tg-031e">
+        acid Mw: <input type="text" id="hh_acid_mw" value="119.98" disabled="disabled">g/mol<br />
+    </th>
+    <th class="tg-031e">
+        base: <input type="text" id="hh_base" value="NA2HPO4" disabled="disabled"><br />
+    </th>
+    <th class="tg-031e">
+        base Mw: <input type="text" id="hh_base_mw" value="141.96" disabled="disabled">g/mol<br />
+    </th>
+  </tr>
+  <tr>
+    <td class="tg-031e">Enter your requirements:</td>
+    <td class="tg-031e">
+        pH:
+        <input type="text" id="hh_req_ph">
+    </td>
+    <td class="tg-031e">
+        Concentration:
+        <input type="text" id="hh_conc_ph">
+    </td>
+    <td class="tg-031e">
+        Volume:
+        <input type="text" id="hh_vol_ph">
+
+    </td>
+    <td class="tg-031e"></td>
+  </tr>
+
+</table>
+
+
+    
+
+    
+    
+
+<!--    pKa: <input type="text" id="hh_coeff" size="5">*10^<input type="text" id="hh_exp" size="5"> <br />    -->
+
+<p> &nbsp; </p>
+
+    <button id="hh_run">calculate</button><br />
+
+<p> &nbsp; </p>
+
+
+<table>
+  <tr>
+    <td class="tg-031e">Results: <br/> You need</td>
+    <td class="tg-031e">
+        Acid mass:
+        <input type="text" id="hh_req_ph">
+    </td>
+    <td class="tg-031e">
+        base mass:
+        <input type="text" id="hh_conc_ph">
+    </td>
+    <td class="tg-031e"></td>
+    <td class="tg-031e"></td>
+  </tr>
+
+</table>
+
+    pH: <input type="text" id="hh_ph"><br />
+
+</body>
+
+</html>
