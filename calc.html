@@ -10,10 +10,10 @@
             // Values must match exact names in the #buffer_system dropdown
 
             var bufferSystemAttributes = {
+                "Sodium phosphate":     [6.82,   "NaH2PO4",       119.98,  "g/mol",   "Na2HPO4",      141.96,     "g/mol"],
                 "Tris":                 [8.214,  "Tris-HCl",      157.59,  "g/mol",   "Tris-OH",      121.136,    "g/mol"],
                 "Ammonium acetate 1":   [9.25,   "Acetic acid",   60.05,   "g/mol",   "NH4-acetate",  77.0825,    "g/mol"],
                 "Ammonium acetate 2":   [4.47,   "Acetic acid",   60.05,   "g/mol",   "NH4-acetate",  77.0825,    "g/mol"],
-                "Sodium phosphate":     [6.82,   "NaH2PO4",       119.98,  "g/mol",   "Na2HPO4",      141.96,     "g/mol"],
             }
 
             function log10(val) {
@@ -35,19 +35,31 @@
                 // pH = pKa + log_10( 0.025 / 0.0025 )
                 // Math.log(Math.pow(10, -7)*4.2)/Math.log(10)
                 // -Math.log(Math.pow(10, -7)*4.2)/Math.log(10) + ( Math.log(0.025/0.0025) /Math.log(10) )
-                acid_base = log10( calc_base / calc_acid );
-                console.log("acid_base: " + acid_base );
 
-                output_ph = pKa + acid_base
+                desired_final_ph = parseFloat ( $("#hh_final_ph").val() )
+                desired_final_conc = parseFloat ( $("#hh_final_conc").val() )
+                desired_final_vol = parseFloat ( $("#hh_final_vol").val() )
 
-//                $("#results").find('input').css('background-color','red').setTimeout(function(){
-//                    $("#results").find('input').css('background-color','white')                    
-//                }, 1000);
+                // base / acid ratio = 10^(desired_final_ph - pKa)
+                ratio_base_to_acid = Math.pow(10, desired_final_ph - pKa)
+                console.log("ratio_base_to_acid: " + ratio_base_to_acid );
 
+                // intermediates
+                intermediate_molar_acid = desired_final_conc / ( 1 +  ratio_base_to_acid )
+                console.log("intermediate_molar_acid: " + intermediate_molar_acid );
+                intermediate_molar_base = desired_final_conc - intermediate_molar_acid
+                console.log("intermediate_molar_base: " + intermediate_molar_base );
+
+                // final
+                final_acid_mass = intermediate_molar_acid * calc_acid * desired_final_vol
+                console.log("final_acid_mass: " + final_acid_mass );
+                final_base_mass = intermediate_molar_base * calc_base * desired_final_vol
+                console.log("final_base_mass: " + final_base_mass );
 
                 // Write out required mass for
-                $("#hh_req_acid_mass").val( output_ph );
-                $("#hh_req_base_mass").val( output_ph );
+                $("#hh_req_acid_mass").val( final_acid_mass );
+                $("#hh_req_base_mass").val( final_base_mass );
+
 
 
             }
@@ -86,8 +98,7 @@
             $("#buffer_system").on('change', updateBufferSystemAttributes);
             
 
-
-
+            
         });
     </script>
 
@@ -146,15 +157,15 @@
     <td class="tg-031e">Enter your requirements:</td>
     <td class="tg-031e">
         pH: <br />
-        <input type="text" id="hh_req_ph">
+        <input type="text" id="hh_final_ph">
     </td>
     <td class="tg-031e">
         Concentration: <br />
-        <input type="text" id="hh_conc_ph">
+        <input type="text" id="hh_final_conc">
     </td>
     <td class="tg-031e">
         Volume: <br />
-        <input type="text" id="hh_vol_ph">
+        <input type="text" id="hh_final_vol">
 
     </td>
     <td class="tg-031e"></td>
@@ -183,8 +194,6 @@
   </tr>
 
 </table>
-
-    pH: <input type="text" id="hh_ph"><br />
 
 </body>
 
