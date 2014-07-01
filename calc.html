@@ -4,10 +4,9 @@
     <script>
         $(document).ready(function() {
 
-
             //// Buffer System Attributes:
             // Change these to update the values which are placed in the input boxes
-            // Values must match exact names in the #buffer_system dropdown
+            // Values must match exact names in the buffer_system dropdown
 
             var bufferSystemAttributes = {
                 "Sodium phosphate":     [6.82,   "NaH2PO4",       119.98,  "g/mol",   "Na2HPO4",      141.96,     "g/mol"],
@@ -123,8 +122,8 @@
 <input type="checkbox" name="custom" value="custom" id="custom_toggle"> Enter custom values
 
 <table class="tg">
-  <tr id="buffer_system">
-    <th class="tg-031e">
+  <tr>
+    <th class="tg_calc">
 
     buffer system: <br />
     <select id="buffer_system">
@@ -136,40 +135,40 @@
     <br />
 
     </th>
-    <th class="tg-031e">
+    <th class="tg_calc">
         acid:<br />
         <input type="text" id="hh_acid" value="NaH2PO4" disabled="disabled"><br />
     </th>
-    <th class="tg-031e">
+    <th class="tg_calc">
         acid Mw:<br />
         <input type="text" id="hh_acid_mw" value="119.98" disabled="disabled"> <input type="text" id="hh_acid_mw_units" value="g/mol" disabled="disabled"><br />
     </th>
-    <th class="tg-031e">
+    <th class="tg_calc">
         base:<br />
         <input type="text" id="hh_base" value="NA2HPO4" disabled="disabled"><br />
     </th>
-    <th class="tg-031e">
+    <th class="tg_calc">
         base Mw:<br />
         <input type="text" id="hh_base_mw" value="141.96" disabled="disabled"> <input type="text" id="hh_base_mw_units" value="g/mol" disabled="disabled"> <br />
     </th>
   </tr>
 
   <tr>
-    <td class="tg-031e">Enter your requirements:</td>
-    <td class="tg-031e">
+    <td class="tg_calc">Enter your requirements:</td>
+    <td class="tg_calc">
         pH: <br />
         <input type="text" id="hh_final_ph">
     </td>
-    <td class="tg-031e">
+    <td class="tg_calc">
         Concentration: <br />
         <input type="text" id="hh_final_conc"> M
     </td>
-    <td class="tg-031e">
+    <td class="tg_calc">
         Volume: <br />
         <input type="text" id="hh_final_vol"> L
 
     </td>
-    <td class="tg-031e"></td>
+    <td class="tg_calc"></td>
   </tr>
 
 </table>
@@ -181,17 +180,17 @@
 Results:
 <table class="tg" id="results">
   <tr>
-    <td class="tg-031e"> You need</td>
-    <td class="tg-031e">
+    <td class="tg_calc"> You need</td>
+    <td class="tg_calc">
         Acid mass:<br/>
         <input type="text" id="hh_req_acid_mass"> g
     </td>
-    <td class="tg-031e">
+    <td class="tg_calc">
         Base mass:<br/>
         <input type="text" id="hh_req_base_mass"> g
     </td>
-    <td class="tg-031e"></td>
-    <td class="tg-031e"></td>
+    <td class="tg_calc"></td>
+    <td class="tg_calc"></td>
   </tr>
 
 </table>
