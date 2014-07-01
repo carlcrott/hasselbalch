@@ -13,7 +13,7 @@
                 "Sodium phosphate":     [6.82,   "NaH2PO4",       119.98,  "g/mol",   "Na2HPO4",      141.96,     "g/mol"],
                 "Tris":                 [8.214,  "Tris-HCl",      157.59,  "g/mol",   "Tris-OH",      121.136,    "g/mol"],
                 "Ammonium acetate 1":   [9.25,   "Acetic acid",   60.05,   "g/mol",   "NH4-acetate",  77.0825,    "g/mol"],
-                "Ammonium acetate 2":   [4.47,   "Acetic acid",   60.05,   "g/mol",   "NH4-acetate",  77.0825,    "g/mol"],
+                "Ammonium acetate 2":   [4.74,   "Acetic acid",   60.05,   "g/mol",   "NH4-acetate",  77.0825,    "g/mol"],
             }
 
             function log10(val) {
@@ -57,10 +57,11 @@
                 console.log("final_base_mass: " + final_base_mass );
 
                 // Write out required mass for
+                // TODO: round units to 2 sig figures
                 $("#hh_req_acid_mass").val( final_acid_mass );
                 $("#hh_req_base_mass").val( final_base_mass );
 
-
+                // TODO: write a few test cases
 
             }
 
@@ -130,13 +131,14 @@
     <select id="buffer_system">
         <option>Sodium phosphate</option>
         <option>Tris</option>
+        <option>Ammonium acetate 1</option>
+        <option>Ammonium acetate 2</option>
     </select>
     <br />
 
     </th>
     <th class="tg-031e">
         acid:<br />
-<!--        <input type="text" id="hh_acid" value="NaH2PO4" disabled="disabled"><br />-->
         <input type="text" id="hh_acid" value="NaH2PO4" disabled="disabled"><br />
     </th>
     <th class="tg-031e">
@@ -177,16 +179,16 @@
 <button id="hh_run">calculate</button><br />
 <p> &nbsp; </p>
 
-
+Results:
 <table class="tg" id="results">
   <tr>
-    <td class="tg-031e">Results: <br/> You need</td>
+    <td class="tg-031e"> You need</td>
     <td class="tg-031e">
         Acid mass:<br/>
         <input type="text" id="hh_req_acid_mass">
     </td>
     <td class="tg-031e">
-        base mass:<br/>
+        Base mass:<br/>
         <input type="text" id="hh_req_base_mass">
     </td>
     <td class="tg-031e"></td>
