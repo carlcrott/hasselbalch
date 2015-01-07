@@ -68,13 +68,13 @@
             function toggleDisabled() {
                 //////
                 // Runs when checkbox is checked
-                if ( $("#custom_toggle").is(":checked") ) {
+                if ( $('#buffer_system').val() == "(custom)" ) {
                     // wipe previous values
                     $('#hh_acid_mw').val('');
                     $('#hh_base_mw').val('');
 
                     // swap out enabled areas
-                    $('#buffer_system').prop('disabled', true);
+                    //$('#buffer_system').prop('disabled', true);
                     $('#hh_acid_mw').prop('disabled', false);
                     $('#hh_base_mw').prop('disabled', false);
                     
@@ -98,10 +98,6 @@
                     $('#hh_acid_mw').prop('disabled', true);
                     $('#hh_base_mw').prop('disabled', true);
 
-                    // now that were back using the stock buffers
-                    $("#buffer_system option[value='Tris']").attr("selected", "selected");
-                    updateBufferSystemAttributes();
-
                     // replace default unit display boxes
                     $('#hh_acid_mw_units').show();
                     $('#hh_base_mw_units').show();
@@ -110,19 +106,23 @@
                 };
             }
 
-            $("#custom_toggle").on('click', toggleDisabled );
-
             function updateBufferSystemAttributes () {
                 bufferSystemName = $("select#buffer_system").val()
                 console.log(bufferSystemName);
-                
-                $("#hh_acid").val(bufferSystemAttributes[bufferSystemName][1]);
-                $("#hh_acid_mw").val(bufferSystemAttributes[bufferSystemName][2]);
-                $("#hh_acid_mw_units").val(bufferSystemAttributes[bufferSystemName][3]);
 
-                $("#hh_base").val(bufferSystemAttributes[bufferSystemName][4]);
-                $("#hh_base_mw").val(bufferSystemAttributes[bufferSystemName][5]);
-                $("#hh_base_mw_units").val(bufferSystemAttributes[bufferSystemName][6]);
+                if ( bufferSystemName == "(custom)") {
+                    toggleDisabled();
+                } else {
+                    $("#hh_acid").val(bufferSystemAttributes[bufferSystemName][1]);
+                    $("#hh_acid_mw").val(bufferSystemAttributes[bufferSystemName][2]);
+                    $("#hh_acid_mw_units").val(bufferSystemAttributes[bufferSystemName][3]);
+
+                    $("#hh_base").val(bufferSystemAttributes[bufferSystemName][4]);
+                    $("#hh_base_mw").val(bufferSystemAttributes[bufferSystemName][5]);
+                    $("#hh_base_mw_units").val(bufferSystemAttributes[bufferSystemName][6]);                    
+                };
+                
+
 
             }
 
@@ -150,10 +150,7 @@
 
 <head>
 
-
 <body>
-
-<input type="checkbox" name="custom" value="custom" id="custom_toggle"> Enter custom values
 
 <table class="tg">
   <tr>
@@ -166,7 +163,8 @@
     <th class="tg_calc">
         buffer system: <br />
         <select id="buffer_system">
-            <option>Sodium phosphate</option>
+            <option>(custom)</option>
+            <option selected="selected">Sodium phosphate</option>
             <option>Tris</option>
             <option>Ammonium acetate 1</option>
             <option>Ammonium acetate 2</option>
