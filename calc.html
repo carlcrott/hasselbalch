@@ -6,7 +6,7 @@
 
             //// Buffer System Attributes:
             // Change these to update the values which are placed in the input boxes
-            // Values must match exact names in the buffer_system dropdown
+            // Values must match exact names in the buffer_system dropdown 
 
             var bufferSystemAttributes = {
                 "Sodium phosphate":     [6.82,   "NaH2PO4",       119.98,  "g/mol",   "Na2HPO4",      141.96,     "g/mol"],
@@ -66,15 +66,48 @@
             $("#hh_run").on('click', hendersonHasselbalch );
 
             function toggleDisabled() {
-                alert("Not Yet Implemented!");
-//                return this.each(function () {
-//                    var $this = $(this);
-//                    if ($this.prop('disabled')) {
-//                        $this.prop('disabled', false).show();
-//                    } else {
-//                        $this.prop('disabled', true).hide();
-//                    }
-//                });
+                //////
+                // Runs when checkbox is checked
+                if ( $("#custom_toggle").is(":checked") ) {
+                    // wipe previous values
+                    $('#hh_acid_mw').val('');
+                    $('#hh_base_mw').val('');
+
+                    // swap out enabled areas
+                    $('#buffer_system').prop('disabled', true);
+                    $('#hh_acid_mw').prop('disabled', false);
+                    $('#hh_base_mw').prop('disabled', false);
+                    
+                    // hide units so we can replace with a drop down
+                    $('#hh_acid_mw_units').hide();
+                    $('#hh_base_mw_units').hide();
+                    $('#hh_acid_mw_units_selector').show();
+                    $('#hh_base_mw_units_selector').show();
+
+                    // disable the named buffers
+                    $('#hh_acid').val("  (custom)  ");
+                    $('#hh_base').val("  (custom)  ");
+
+                } else {
+
+                //////
+                // Runs when checkbox is UNchecked
+
+                    // swap out disabled areas
+                    $('#buffer_system').prop('disabled', false);
+                    $('#hh_acid_mw').prop('disabled', true);
+                    $('#hh_base_mw').prop('disabled', true);
+
+                    // now that were back using the stock buffers
+                    $("#buffer_system option[value='Tris']").attr("selected", "selected");
+                    updateBufferSystemAttributes();
+
+                    // replace default unit display boxes
+                    $('#hh_acid_mw_units').show();
+                    $('#hh_base_mw_units').show();
+                    $('#hh_acid_mw_units_selector').hide();
+                    $('#hh_base_mw_units_selector').hide();
+                };
             }
 
             $("#custom_toggle").on('click', toggleDisabled );
@@ -112,6 +145,7 @@
             text-align: center;
             border: 1px solid lightgrey;
             overflow:hidden;word-break:normal;}
+        #hh_acid_mw_units_selector, #hh_base_mw_units_selector {display: none;};
     </style>
 
 <head>
@@ -123,33 +157,72 @@
 
 <table class="tg">
   <tr>
+
+
+<!-- //////////////////////////////////////
+          Buffer System
+////////////////////////////////////// -->
+
     <th class="tg_calc">
-
-    buffer system: <br />
-    <select id="buffer_system">
-        <option>Sodium phosphate</option>
-        <option>Tris</option>
-        <option>Ammonium acetate 1</option>
-        <option>Ammonium acetate 2</option>
-    </select>
-    <br />
-
+        buffer system: <br />
+        <select id="buffer_system">
+            <option>Sodium phosphate</option>
+            <option>Tris</option>
+            <option>Ammonium acetate 1</option>
+            <option>Ammonium acetate 2</option>
+        </select>
+        <br />
     </th>
+
+
+<!-- //////////////////////////////////////
+          Acid Name 
+////////////////////////////////////// -->
+
     <th class="tg_calc">
         acid:<br />
         <input type="text" id="hh_acid" value="NaH2PO4" disabled="disabled"><br />
     </th>
+
+
+<!-- //////////////////////////////////////
+          Acid Mw
+////////////////////////////////////// -->
+
     <th class="tg_calc">
         acid Mw:<br />
-        <input type="text" id="hh_acid_mw" value="119.98" disabled="disabled"> <input type="text" id="hh_acid_mw_units" value="g/mol" disabled="disabled"><br />
+        <input type="text" id="hh_acid_mw" value="119.98" disabled="disabled"> <input type="text" id="hh_acid_mw_units" value="g/mol" disabled="disabled">
+
+        <select id='hh_acid_mw_units_selector'>
+          <option value="g-mol">g/mol</option>
+          <option value="mg-mol">mg/mol</option>
+        </select>
     </th>
+
+
+<!-- //////////////////////////////////////
+          Base Name
+////////////////////////////////////// -->
+
     <th class="tg_calc">
         base:<br />
         <input type="text" id="hh_base" value="NA2HPO4" disabled="disabled"><br />
     </th>
+
+
+<!-- //////////////////////////////////////
+          Base Mw Cell
+////////////////////////////////////// -->
+
     <th class="tg_calc">
         base Mw:<br />
-        <input type="text" id="hh_base_mw" value="141.96" disabled="disabled"> <input type="text" id="hh_base_mw_units" value="g/mol" disabled="disabled"> <br />
+        <input type="text" id="hh_base_mw" value="141.96" disabled="disabled"> <input type="text" id="hh_base_mw_units" value="g/mol" disabled="disabled">
+
+        <select id='hh_base_mw_units_selector'>
+          <option value="g-mol">g/mol</option>
+          <option value="mg-mol">mg/mol</option>
+        </select>
+
     </th>
   </tr>
 
