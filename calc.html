@@ -76,12 +76,6 @@
                     // swap out enabled areas
                     $('#hh_acid_mw').prop('disabled', false);
                     $('#hh_base_mw').prop('disabled', false);
-                    
-                    // hide units so we can replace with a drop down
-                    $('#hh_acid_mw_units').hide();
-                    $('#hh_base_mw_units').hide();
-                    $('#hh_acid_mw_units_selector').show();
-                    $('#hh_base_mw_units_selector').show();
 
                     // disable the named buffers
                     $('#hh_acid').val("  (custom)  ");
@@ -96,11 +90,6 @@
                     $('#hh_acid_mw').prop('disabled', true);
                     $('#hh_base_mw').prop('disabled', true);
 
-                    // replace default unit display boxes
-                    $('#hh_acid_mw_units').show();
-                    $('#hh_base_mw_units').show();
-                    $('#hh_acid_mw_units_selector').hide();
-                    $('#hh_base_mw_units_selector').hide();
                 };
             }
 
@@ -188,11 +177,6 @@
     <th class="tg_calc">
         acid Mw:<br />
         <input type="text" id="hh_acid_mw" value="119.98" disabled="disabled"> <input type="text" id="hh_acid_mw_units" value="g/mol" disabled="disabled">
-
-        <select id='hh_acid_mw_units_selector'>
-          <option value="g-mol">g/mol</option>
-          <option value="mg-mol">mg/mol</option>
-        </select>
     </th>
 
 
@@ -213,12 +197,6 @@
     <th class="tg_calc">
         base Mw:<br />
         <input type="text" id="hh_base_mw" value="141.96" disabled="disabled"> <input type="text" id="hh_base_mw_units" value="g/mol" disabled="disabled">
-
-        <select id='hh_base_mw_units_selector'>
-          <option value="g-mol">g/mol</option>
-          <option value="mg-mol">mg/mol</option>
-        </select>
-
     </th>
   </tr>
 
