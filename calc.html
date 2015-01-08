@@ -65,16 +65,15 @@
 
             $("#hh_run").on('click', hendersonHasselbalch );
 
-            function toggleDisabled() {
+            function toggleCustomBufferSystem() {
                 //////
-                // Runs when checkbox is checked
+                // Runs when switching TO custom
                 if ( $('#buffer_system').val() == "(custom)" ) {
                     // wipe previous values
                     $('#hh_acid_mw').val('');
                     $('#hh_base_mw').val('');
 
                     // swap out enabled areas
-                    //$('#buffer_system').prop('disabled', true);
                     $('#hh_acid_mw').prop('disabled', false);
                     $('#hh_base_mw').prop('disabled', false);
                     
@@ -89,9 +88,8 @@
                     $('#hh_base').val("  (custom)  ");
 
                 } else {
-
                 //////
-                // Runs when checkbox is UNchecked
+                // Runs when switching TO our stock buffer systems
 
                     // swap out disabled areas
                     $('#buffer_system').prop('disabled', false);
@@ -111,7 +109,7 @@
                 console.log(bufferSystemName);
 
                 if ( bufferSystemName == "(custom)") {
-                    toggleDisabled();
+                    toggleCustomBufferSystem();
                 } else {
                     $("#hh_acid").val(bufferSystemAttributes[bufferSystemName][1]);
                     $("#hh_acid_mw").val(bufferSystemAttributes[bufferSystemName][2]);
