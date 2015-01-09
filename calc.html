@@ -4,12 +4,11 @@
     <script>
 
         // change this to enable running test suite
-        var enableTestSuite = false;
+        var debugOn = true;
 
         //// Buffer System Attributes:
         // Change these to update the values which are placed in the input boxes
         // Values must match exact names in the buffer_system dropdown 
-
         var bufferSystemAttributes = {
             "Sodium phosphate":     [6.82,   "NaH2PO4",       119.98,  "g/mol",   "Na2HPO4",      141.96,     "g/mol"],
             "Tris":                 [8.214,  "Tris-HCl",      157.59,  "g/mol",   "Tris-OH",      121.136,    "g/mol"],
@@ -22,25 +21,36 @@
         //  Establish functions
         /////////////////////
 
+        // enable custom logging
+        var log = function() { if (debugOn) { console.log(arguments) } };
+
         function runTestSuite(){
-            //                          buffer name          acid Mw,   base Mw,    pH,     conc,   vol,    acid out,   base out 
-            testTrisInputs            = ['Tris',             157.591,   121.136,    7,      1,      0.5,    '74.26',    '3.49'];
-            testSodiumPhosphateInputs = ['Sodium phosphate', 119.98,    141.96,     7.4,    1,      0.5,    '12.49',    '56.20'];
-            testSystems = [testTrisInputs, testSodiumPhosphateInputs];
+                //buffer name        acid Mw,   base Mw,    pH,     conc,   vol,    acid out,   base out,   pKa 
+            testSystems = [
+                ['Tris',             157.591,   121.136,    7,      1,      0.5,    '74.26',    '3.49',     '8.214'],
+                ['Sodium phosphate', 119.98,    141.96,     7.4,    1,      0.5,    '12.49',    '56.20',    '6.82'],
+                ['(custom)',         60.05,     77.0825,    8.5,    1,      0.1,    '5.10',     '1.16',     '9.25'],    
+            ];
 
             for (i = 0; i < testSystems.length; i++) {
                 // select system
                 $("#buffer_system").val( testSystems[i][0] );
+
                 // input test values
                 $("#hh_acid_mw").val( testSystems[i][1] );
                 $("#hh_base_mw").val( testSystems[i][2] );
                 $("#hh_final_ph").val( testSystems[i][3] );
                 $("#hh_final_conc").val( testSystems[i][4] );
                 $("#hh_final_vol").val( testSystems[i][5] );
+
+                // set pKa in the case of custom
+                testSystems[i][0] == "(custom)" && $("#hh_pka").val( parseFloat(testSystems[i][8]) );
+
                 // fire off calculation
                 $('#hh_run').trigger('click');
+
                 // verify outputs
-                if ( ( $('#hh_req_acid_mass').val() == testSystems[i][6] ) && ( $('#hh_req_base_mass').val() == testSystems[i][7] ) ){
+                if ( $('#hh_req_acid_mass').val() == testSystems[i][6] && $('#hh_req_base_mass').val() == testSystems[i][7] ){
                     console.log( "------------ " + testSystems[i][0] + " PASSED!" );
                 } else {
                     console.log( "------------ " + testSystems[i][0] + " FAILED!" );
@@ -59,7 +69,7 @@
         }
 
         function log10(val) {
-          return Math.log(val) / Math.LN10;
+            return Math.log(val) / Math.LN10;
         }
 
         function hendersonHasselbalch() {
@@ -78,33 +88,31 @@
                 pKa = bufferSystemAttributes[bufferSystemName][0];
             }
 
-            console.log("pKa: " + pKa );
+            log( "pKa: " + pKa );
 
             // base / acid ratio = 10^(desired_final_ph - pKa)
             ratio_base_to_acid = Math.pow(10, desired_final_ph - pKa)
-            console.log("ratio_base_to_acid: " + ratio_base_to_acid );
+            log( "ratio_base_to_acid: " + ratio_base_to_acid );
 
             // intermediates
             intermediate_molar_acid = desired_final_conc / ( 1 +  ratio_base_to_acid )
-            console.log("intermediate_molar_acid: " + intermediate_molar_acid );
+            log( "intermediate_molar_acid: " + intermediate_molar_acid );
             intermediate_molar_base = desired_final_conc - intermediate_molar_acid
-            console.log("intermediate_molar_base: " + intermediate_molar_base );
+            log( "intermediate_molar_base: " + intermediate_molar_base );
 
             // final
             final_acid_mass = intermediate_molar_acid * calc_acid * desired_final_vol
-            console.log("final_acid_mass: " + final_acid_mass );
+            log( "final_acid_mass: " + final_acid_mass );
             final_base_mass = intermediate_molar_base * calc_base * desired_final_vol
-            console.log("final_base_mass: " + final_base_mass );
+            log( "final_base_mass: " + final_base_mass );
 
             // Write out required mass for
             $("#hh_req_acid_mass").val( final_acid_mass.toFixed(2) );
             $("#hh_req_base_mass").val( final_base_mass.toFixed(2) );
 
-            // TODO: write a few test cases
-
         }
 
-        function checkInputFieldPermissions( ) {
+        function checkInputFieldPermissions() {
             //////
             // Runs when switching TO custom buffer system
             if ( $('#buffer_system').val() == "(custom)" ) {
@@ -140,7 +148,7 @@
 
         function updateBufferSystemAttributes () {
             bufferSystemName = $("select#buffer_system").val()
-            console.log(bufferSystemName);
+            log(bufferSystemName);
 
             checkInputFieldPermissions();
 
@@ -164,13 +172,12 @@
         /////////////////////
 
         $(document).ready(function() {
-
             // On changing the buffer system update the buffer attributes
             $("#buffer_system").on('change', updateBufferSystemAttributes);
             $("#hh_run").on('click', hendersonHasselbalch );
 
             // If in debug mode show the button to run tests
-            if ( enableTestSuite == true ) {
+            if ( debugOn == true ) {
                 $('#hh_run_tests').show();
                 $('#hh_run_tests').on('click', runTestSuite);
             } else {
@@ -239,7 +246,8 @@
 
     <th class="tg_calc">
         acid Mw:<br />
-        <input type="text" id="hh_acid_mw" value="119.98" disabled="disabled"> <input type="text" id="hh_acid_mw_units" value="g/mol" disabled="disabled">
+        <input type="text" id="hh_acid_mw" value="119.98" disabled="disabled">
+        <input type="text" id="hh_acid_mw_units" value="g/mol" disabled="disabled">
     </th>
 
 
@@ -259,7 +267,8 @@
 
     <th class="tg_calc">
         base Mw:<br />
-        <input type="text" id="hh_base_mw" value="141.96" disabled="disabled"> <input type="text" id="hh_base_mw_units" value="g/mol" disabled="disabled">
+        <input type="text" id="hh_base_mw" value="141.96" disabled="disabled">
+        <input type="text" id="hh_base_mw_units" value="g/mol" disabled="disabled">
     </th>
     
   </tr>
