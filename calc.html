@@ -4,7 +4,7 @@
     <script>
 
         // change this to enable running test suite
-        var DEBUG=false;
+        var DEBUG=true;
 
         //// Buffer System Attributes:
         // Change these to update the values which are placed in the input boxes
@@ -23,53 +23,39 @@
         /////////////////////
 
         function runTestSuite(){
+            //                          buffer name          base Mw,   acid Mw,    pH,     conc,   vol,    acid out,   base out 
+            testTrisInputs            = ['Tris',             121.136,   157.591,    7,      1,      0.5,    '74.26',    '3.49'];
+            testSodiumPhosphateInputs = ['Sodium phosphate', 141.96,    119.98,     7.4,    1,      0.5,    '12.49',    '56.20'];
+            testSystems = [testTrisInputs, testSodiumPhosphateInputs];
 
-            //////////
-            // Tris
-            $("#buffer_system").val('Tris');
-            // input some values
-            $("#hh_base_mw").val(121.136);
-            $("#hh_acid_mw").val(157.591);
-            $("#hh_final_ph").val(7);
-            $("#hh_final_conc").val(1);
-            $("#hh_final_vol").val(0.5);
+            for (i = 0; i < testSystems.length; i++) {
+                // select system
+                $("#buffer_system").val( testSystems[i][0] );
+                // input test values
+                $("#hh_base_mw").val( testSystems[i][1] );
+                $("#hh_acid_mw").val( testSystems[i][2] );
+                $("#hh_final_ph").val( testSystems[i][3] );
+                $("#hh_final_conc").val( testSystems[i][4] );
+                $("#hh_final_vol").val( testSystems[i][5] );
+                // fire off calculation
+                $('#hh_run').trigger('click');
+                // verify outputs
+                if ( ( $('#hh_req_acid_mass').val() == testSystems[i][6] ) && ( $('#hh_req_base_mass').val() == testSystems[i][7] ) ){
+                    console.log( "------------ " + testSystems[i][0] + " PASSED!" );
+                } else {
+                    console.log( "------------ " + testSystems[i][0] + " FAILED!" );
+                }
 
-            $('#hh_run').trigger('click');
+            }
 
-            // Verifying Tris
-            if ( ( $('#hh_req_acid_mass').val() == '74.26' ) && ( $('#hh_req_base_mass').val() == '3.49' ) ){
-                testTris = "PASSED!";
-            } else {
-                testTris = "FAILED!";
-            };
-
-            //////////
-            // Sodium phosphate
-            $("#buffer_system").val('Sodium phosphate'); 
-
-            // input some values
-            $("#hh_base_mw").val(141.96);
-            $("#hh_acid_mw").val(119.98);
-            $("#hh_final_ph").val(7.4);
-            $("#hh_final_conc").val(1);
-            $("#hh_final_vol").val(0.5);
-
-            $('#hh_run').trigger('click');
-
-            // Verifying Sodium phosphate
-            if ( ( $('#hh_req_acid_mass').val() == '12.49' ) && ( $('#hh_req_base_mass').val() == '56.20' ) ){
-                testSodiumPhosphate = "PASSED!";
-            } else {
-                testSodiumPhosphate = "FAILED!";
-            };
-
-
-            // Final output for tests
-            alert(
-                "- Tris: " + testTris + "\n" +
-                "- Sodium phosphate: " + testSodiumPhosphate + "\n"
-            );
-
+            // clear out test residual
+            $("#hh_base_mw").val("");
+            $("#hh_acid_mw").val("");
+            $("#hh_final_ph").val("");
+            $("#hh_final_conc").val("");
+            $("#hh_final_vol").val("");
+            $('#hh_req_acid_mass').val("")
+            $('#hh_req_base_mass').val("")
 
         }
 
