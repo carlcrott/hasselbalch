@@ -9,9 +9,9 @@
         //// Buffer System Attributes:
         // Change these to update the values which are placed in the input boxes
         var bufferSystemAttributes = {
-            "Sodium phosphate":     ["NaH2PO4",       119.98,  "g/mol",   "Na2HPO4",      141.96,     "g/mol"],
-            "Tris":                 ["Tris-HCl",      157.59,  "g/mol",   "Tris-OH",      121.136,    "g/mol"],
-            "Ammonium acetate":     ["Acetic acid",   60.05,   "g/mol",   "NH4-acetate",  77.0825,    "g/mol"],
+            "Sodium phosphate":     ["NaH2PO4",       119.98,   "Na2HPO4",      141.96],
+            "Tris":                 ["Tris-HCl",      157.59,   "Tris-OH",      121.136],
+            "Ammonium acetate":     ["Acetic acid",   60.05,    "NH4-acetate",  77.0825],
         }
 
         /////////////////////
@@ -22,7 +22,7 @@
         var log = function() { if (debugOn) { console.log(arguments) } };
 
         function runTestSuite(){
-                //buffer name        acid Mw,   base Mw,    pH,     conc,   vol,    acid out,   base out,   pKa 
+            //   buffer name         acid Mw,   base Mw,    pH,     conc,   vol,    acid out,   base out,   pKa 
             testSystems = [
                 ['Tris',             157.591,   121.136,    7,      1,      0.5,    '74.26',    '3.49',     8.214],
                 ['Sodium phosphate', 119.98,    141.96,     7.4,    1,      0.5,    '12.49',    '56.20',    6.82],
@@ -138,11 +138,9 @@
             if ( bufferSystemName != "(custom)" ) {
                 $("#hh_acid").val(bufferSystemAttributes[bufferSystemName][0]);
                 $("#hh_acid_mw").val(bufferSystemAttributes[bufferSystemName][1]);
-                $("#hh_acid_mw_units").val(bufferSystemAttributes[bufferSystemName][2]);
 
-                $("#hh_base").val(bufferSystemAttributes[bufferSystemName][3]);
-                $("#hh_base_mw").val(bufferSystemAttributes[bufferSystemName][4]);
-                $("#hh_base_mw_units").val(bufferSystemAttributes[bufferSystemName][5]);
+                $("#hh_base").val(bufferSystemAttributes[bufferSystemName][2]);
+                $("#hh_base_mw").val(bufferSystemAttributes[bufferSystemName][3]);
 
             };
 
@@ -159,11 +157,7 @@
             $("#hh_run").on('click', hendersonHasselbalch );
 
             // If in debug mode show the button to run tests
-            if ( debugOn == true ) {
-                $('#hh_run_tests').show().on('click', runTestSuite);
-            } else {
-                $('#hh_run_tests').hide();
-            };
+            debugOn && $('#hh_run_tests').show().on('click', runTestSuite);
 
             // dynamically populate buffer system dropdown
             $.each(bufferSystemAttributes, function(key, value) {
@@ -181,6 +175,7 @@
     </script>
 
     <style type="text/css">
+        .tg_calc {padding:10px 15px;}
         input[type="text"]{
             width:80px;
         }
@@ -193,7 +188,7 @@
             overflow: hidden;
             word-break: normal;
         }
-        #hh_acid_mw_units_selector, #hh_base_mw_units_selector { display: none;};
+        #hh_run_tests { display: none;};
     </style>
 
 <head>
@@ -234,7 +229,7 @@
     <th class="tg_calc">
         acid Mw:<br />
         <input type="text" id="hh_acid_mw" value="119.98" disabled="disabled">
-        <input type="text" id="hh_acid_mw_units" value="g/mol" disabled="disabled">
+        g/mol
     </th>
 
 
@@ -255,7 +250,7 @@
     <th class="tg_calc">
         base Mw:<br />
         <input type="text" id="hh_base_mw" value="141.96" disabled="disabled">
-        <input type="text" id="hh_base_mw_units" value="g/mol" disabled="disabled">
+        g/mol
     </th>
     
   </tr>
@@ -300,8 +295,6 @@ Results:
         Base mass:<br/>
         <input type="text" id="hh_req_base_mass"> g
     </td>
-    <td class="tg_calc"></td>
-    <td class="tg_calc"></td>
   </tr>
 
 </table>
