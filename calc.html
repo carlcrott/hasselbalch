@@ -8,7 +8,9 @@
 
         //// Buffer System Attributes:
         // Change these to update the values which are placed in the input boxes
+
         var bufferSystemAttributes = {
+        //  "System Name":          ["acid",          acid Mw,  "base",         base Mw]
             "Sodium phosphate":     ["NaH2PO4",       119.98,   "Na2HPO4",      141.96],
             "Tris":                 ["Tris-HCl",      157.59,   "Tris-OH",      121.136],
             "Ammonium acetate":     ["Acetic acid",   60.05,    "NH4-acetate",  77.0825],
@@ -57,6 +59,19 @@
             $("#buffer_system").val("Sodium phosphate");
             updateBufferSystemAttributes();
 
+        }
+
+        // ensure bufferSystemAttributes is correctly formatted
+        function verifyBufferSystemFormatting( bufferSystemObj ){
+            $.each( bufferSystemObj, function(key, value) {
+                typeof( key ) == "string" ? "" : alert('bufferSystemAttributes key: ' + key + ' should be a string');
+                typeof( value[0] ) == "string" ? "" : alert('The 1st entry in \"' + key + '\" should be a string');
+                typeof( value[1] ) == "number" ? "" : alert('The 2nd entry in \"' + key + '\" should be a number');
+                typeof( value[2] ) == "string" ? "" : alert('The 3rd entry in \"' + key + '\" should be a string');
+                typeof( value[3] ) == "number" ? "" : alert('The 4th entry in \"' + key + '\" should be a number');
+            });
+            
+            
         }
 
         function log10(val) {
@@ -158,6 +173,8 @@
 
             // If in debug mode show the button to run tests
             debugOn && $('#hh_run_tests').show().on('click', runTestSuite);
+
+            verifyBufferSystemFormatting(bufferSystemAttributes);
 
             // dynamically populate buffer system dropdown
             $.each(bufferSystemAttributes, function(key, value) {
