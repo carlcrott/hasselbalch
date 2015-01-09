@@ -2,123 +2,139 @@
 <head>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script>
-        $(document).ready(function() {
 
-            //// Buffer System Attributes:
-            // Change these to update the values which are placed in the input boxes
-            // Values must match exact names in the buffer_system dropdown 
+        //// Buffer System Attributes:
+        // Change these to update the values which are placed in the input boxes
+        // Values must match exact names in the buffer_system dropdown 
 
-            var bufferSystemAttributes = {
-                "Sodium phosphate":     [6.82,   "NaH2PO4",       119.98,  "g/mol",   "Na2HPO4",      141.96,     "g/mol"],
-                "Tris":                 [8.214,  "Tris-HCl",      157.59,  "g/mol",   "Tris-OH",      121.136,    "g/mol"],
-                "Ammonium acetate 1":   [9.25,   "Acetic acid",   60.05,   "g/mol",   "NH4-acetate",  77.0825,    "g/mol"],
-                "Ammonium acetate 2":   [4.74,   "Acetic acid",   60.05,   "g/mol",   "NH4-acetate",  77.0825,    "g/mol"],
-            }
+        var bufferSystemAttributes = {
+            "Sodium phosphate":     [6.82,   "NaH2PO4",       119.98,  "g/mol",   "Na2HPO4",      141.96,     "g/mol"],
+            "Tris":                 [8.214,  "Tris-HCl",      157.59,  "g/mol",   "Tris-OH",      121.136,    "g/mol"],
+            "Ammonium acetate 1":   [9.25,   "Acetic acid",   60.05,   "g/mol",   "NH4-acetate",  77.0825,    "g/mol"],
+            "Ammonium acetate 2":   [4.74,   "Acetic acid",   60.05,   "g/mol",   "NH4-acetate",  77.0825,    "g/mol"],
+        }
 
-            function log10(val) {
-              return Math.log(val) / Math.LN10;
-            }
 
-            function hendersonHasselbalch() {
-                calc_coeff = parseFloat( $("#hh_coeff").val() );
-                calc_exp = parseFloat( $("#hh_exp").val() );
-                calc_base = parseFloat( $("#hh_base_mw").val() );
-                calc_acid = parseFloat( $("#hh_acid_mw").val() );
+        /////////////////////
+        //  Establish functions
+        /////////////////////
 
-                // Get pKa from bufferSystemAttributes using the name of the buffer system
-                bufferSystemName = $("select#buffer_system").val()
+        function log10(val) {
+          return Math.log(val) / Math.LN10;
+        }
+
+        function hendersonHasselbalch() {
+            calc_coeff = parseFloat( $("#hh_coeff").val() );
+            calc_exp = parseFloat( $("#hh_exp").val() );
+            calc_base = parseFloat( $("#hh_base_mw").val() );
+            calc_acid = parseFloat( $("#hh_acid_mw").val() );
+            desired_final_ph = parseFloat( $("#hh_final_ph").val() )
+            desired_final_conc = parseFloat( $("#hh_final_conc").val() )
+            desired_final_vol = parseFloat( $("#hh_final_vol").val() )
+
+            // Get pKa from bufferSystemAttributes using the name of the buffer system
+            bufferSystemName = $("select#buffer_system").val()
+
+            if ( bufferSystemName == "(custom)" ) {
+                pKa = $("#hh_pka").val();
+            } else {
                 pKa = bufferSystemAttributes[bufferSystemName][0];
-                console.log("pKa: " + pKa );
-
-                // pH = pKa + log_10( base / acid )
-                // pH = pKa + log_10( 0.025 / 0.0025 )
-                // Math.log(Math.pow(10, -7)*4.2)/Math.log(10)
-                // -Math.log(Math.pow(10, -7)*4.2)/Math.log(10) + ( Math.log(0.025/0.0025) /Math.log(10) )
-
-                desired_final_ph = parseFloat ( $("#hh_final_ph").val() )
-                desired_final_conc = parseFloat ( $("#hh_final_conc").val() )
-                desired_final_vol = parseFloat ( $("#hh_final_vol").val() )
-
-                // base / acid ratio = 10^(desired_final_ph - pKa)
-                ratio_base_to_acid = Math.pow(10, desired_final_ph - pKa)
-                console.log("ratio_base_to_acid: " + ratio_base_to_acid );
-
-                // intermediates
-                intermediate_molar_acid = desired_final_conc / ( 1 +  ratio_base_to_acid )
-                console.log("intermediate_molar_acid: " + intermediate_molar_acid );
-                intermediate_molar_base = desired_final_conc - intermediate_molar_acid
-                console.log("intermediate_molar_base: " + intermediate_molar_base );
-
-                // final
-                final_acid_mass = intermediate_molar_acid * calc_acid * desired_final_vol
-                console.log("final_acid_mass: " + final_acid_mass );
-                final_base_mass = intermediate_molar_base * calc_base * desired_final_vol
-                console.log("final_base_mass: " + final_base_mass );
-
-                // Write out required mass for
-                $("#hh_req_acid_mass").val( final_acid_mass.toFixed(2) );
-                $("#hh_req_base_mass").val( final_base_mass.toFixed(2) );
-
-                // TODO: write a few test cases
-
             }
 
-            $("#hh_run").on('click', hendersonHasselbalch );
+            console.log("pKa: " + pKa );
 
-            function toggleCustomBufferSystem() {
-                //////
-                // Runs when switching TO custom
-                if ( $('#buffer_system').val() == "(custom)" ) {
-                    // wipe previous values
-                    $('#hh_acid_mw').val('');
-                    $('#hh_base_mw').val('');
+            // base / acid ratio = 10^(desired_final_ph - pKa)
+            ratio_base_to_acid = Math.pow(10, desired_final_ph - pKa)
+            console.log("ratio_base_to_acid: " + ratio_base_to_acid );
 
-                    // swap out enabled areas
-                    $('#hh_acid_mw').prop('disabled', false);
-                    $('#hh_base_mw').prop('disabled', false);
+            // intermediates
+            intermediate_molar_acid = desired_final_conc / ( 1 +  ratio_base_to_acid )
+            console.log("intermediate_molar_acid: " + intermediate_molar_acid );
+            intermediate_molar_base = desired_final_conc - intermediate_molar_acid
+            console.log("intermediate_molar_base: " + intermediate_molar_base );
 
-                    // disable the named buffers
-                    $('#hh_acid').val("  (custom)  ");
-                    $('#hh_base').val("  (custom)  ");
+            // final
+            final_acid_mass = intermediate_molar_acid * calc_acid * desired_final_vol
+            console.log("final_acid_mass: " + final_acid_mass );
+            final_base_mass = intermediate_molar_base * calc_base * desired_final_vol
+            console.log("final_base_mass: " + final_base_mass );
 
-                } else {
-                //////
-                // Runs when switching TO our stock buffer systems
+            // Write out required mass for
+            $("#hh_req_acid_mass").val( final_acid_mass.toFixed(2) );
+            $("#hh_req_base_mass").val( final_base_mass.toFixed(2) );
 
-                    // swap out disabled areas
-                    $('#buffer_system').prop('disabled', false);
-                    $('#hh_acid_mw').prop('disabled', true);
-                    $('#hh_base_mw').prop('disabled', true);
+            // TODO: write a few test cases
 
-                };
-            }
+        }
 
-            function updateBufferSystemAttributes () {
-                bufferSystemName = $("select#buffer_system").val()
-                console.log(bufferSystemName);
+        function checkInputFieldPermissions( ) {
+            //////
+            // Runs when switching TO custom buffer system
+            if ( $('#buffer_system').val() == "(custom)" ) {
 
-                if ( bufferSystemName == "(custom)") {
-                    toggleCustomBufferSystem();
-                } else {
-                    $("#hh_acid").val(bufferSystemAttributes[bufferSystemName][1]);
-                    $("#hh_acid_mw").val(bufferSystemAttributes[bufferSystemName][2]);
-                    $("#hh_acid_mw_units").val(bufferSystemAttributes[bufferSystemName][3]);
+                // wipe previous values
+                $('#hh_acid_mw').val('');
+                $('#hh_base_mw').val('');
+                $('#hh_pka').val('');
 
-                    $("#hh_base").val(bufferSystemAttributes[bufferSystemName][4]);
-                    $("#hh_base_mw").val(bufferSystemAttributes[bufferSystemName][5]);
-                    $("#hh_base_mw_units").val(bufferSystemAttributes[bufferSystemName][6]);                    
-                };
-                
+                // enable user input
+                $('#hh_acid_mw').prop('disabled', false);
+                $('#hh_base_mw').prop('disabled', false);
+                $('#hh_pka').prop('disabled', false);
+
+                // disable the named buffers
+                $('#hh_acid').val("  (custom)  ");
+                $('#hh_base').val("  (custom)  ");
+
+            } else {
+            //////
+            // Runs when switching TO our stock buffer systems
+
+                // enable buffer system drop down
+                $('#buffer_system').prop('disabled', false);
+
+                // disable user input
+                $('#hh_acid_mw').prop('disabled', true);
+                $('#hh_base_mw').prop('disabled', true);
+                $('#hh_pka').prop('disabled', true);
+
+            };
+        }
+
+        function updateBufferSystemAttributes () {
+            bufferSystemName = $("select#buffer_system").val()
+            console.log(bufferSystemName);
+
+            checkInputFieldPermissions();
+
+            if ( bufferSystemName != "(custom)" ) {
+                $("#hh_acid").val(bufferSystemAttributes[bufferSystemName][1]);
+                $("#hh_acid_mw").val(bufferSystemAttributes[bufferSystemName][2]);
+                $("#hh_acid_mw_units").val(bufferSystemAttributes[bufferSystemName][3]);
+
+                $("#hh_base").val(bufferSystemAttributes[bufferSystemName][4]);
+                $("#hh_base_mw").val(bufferSystemAttributes[bufferSystemName][5]);
+                $("#hh_base_mw_units").val(bufferSystemAttributes[bufferSystemName][6]);
+
+                $("#hh_pka").val(bufferSystemAttributes[bufferSystemName][0]);
+            };
+
+        }
 
 
-            }
+        /////////////////////
+        //  Actual page binding 
+        /////////////////////
+
+        $(document).ready(function() {
 
             // On changing the buffer system update the buffer attributes
             $("#buffer_system").on('change', updateBufferSystemAttributes);
-            
-
-            
+            $("#hh_run").on('click', hendersonHasselbalch );
+                        
         });
+
+
     </script>
 
     <style type="text/css">
@@ -198,6 +214,7 @@
         base Mw:<br />
         <input type="text" id="hh_base_mw" value="141.96" disabled="disabled"> <input type="text" id="hh_base_mw_units" value="g/mol" disabled="disabled">
     </th>
+    
   </tr>
 
   <tr>
@@ -213,16 +230,20 @@
     <td class="tg_calc">
         Volume: <br />
         <input type="text" id="hh_final_vol"> L
-
     </td>
-    <td class="tg_calc"></td>
+    <td class="tg_calc">
+        pKa: <br />
+        <input type="text" id="hh_pka" value="6.82" disabled="disabled">
+    </td>
   </tr>
 
 </table>
 
 <p> &nbsp; </p>
-<button id="hh_run">calculate</button><br />
+<button id="hh_run">calculate</button> <br /> <br />
 <p> &nbsp; </p>
+
+
 
 Results:
 <table class="tg" id="results">
