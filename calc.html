@@ -4,7 +4,7 @@
     <script>
 
         // change this to enable running test suite
-        var debugOn = true;
+        var debugOn = false;
 
         //// Buffer System Attributes:
         // Change these to update the values which are placed in the input boxes
@@ -12,10 +12,8 @@
         var bufferSystemAttributes = {
             "Sodium phosphate":     [6.82,   "NaH2PO4",       119.98,  "g/mol",   "Na2HPO4",      141.96,     "g/mol"],
             "Tris":                 [8.214,  "Tris-HCl",      157.59,  "g/mol",   "Tris-OH",      121.136,    "g/mol"],
-            "Ammonium acetate 1":   [9.25,   "Acetic acid",   60.05,   "g/mol",   "NH4-acetate",  77.0825,    "g/mol"],
-            "Ammonium acetate 2":   [4.74,   "Acetic acid",   60.05,   "g/mol",   "NH4-acetate",  77.0825,    "g/mol"],
+            "Ammonium acetate":     [9.25,   "Acetic acid",   60.05,   "g/mol",   "NH4-acetate",  77.0825,    "g/mol"],
         }
-
 
         /////////////////////
         //  Establish functions
@@ -27,9 +25,9 @@
         function runTestSuite(){
                 //buffer name        acid Mw,   base Mw,    pH,     conc,   vol,    acid out,   base out,   pKa 
             testSystems = [
-                ['Tris',             157.591,   121.136,    7,      1,      0.5,    '74.26',    '3.49',     '8.214'],
-                ['Sodium phosphate', 119.98,    141.96,     7.4,    1,      0.5,    '12.49',    '56.20',    '6.82'],
-                ['(custom)',         60.05,     77.0825,    8.5,    1,      0.1,    '5.10',     '1.16',     '9.25'],    
+                ['Tris',             157.591,   121.136,    7,      1,      0.5,    '74.26',    '3.49',     8.214],
+                ['Sodium phosphate', 119.98,    141.96,     7.4,    1,      0.5,    '12.49',    '56.20',    6.82],
+                ['(custom)',         60.05,     77.0825,    8.5,    1,      0.1,    '5.10',     '1.16',     9.25],    
             ];
 
             for (i = 0; i < testSystems.length; i++) {
@@ -39,12 +37,10 @@
                 // input test values
                 $("#hh_acid_mw").val( testSystems[i][1] );
                 $("#hh_base_mw").val( testSystems[i][2] );
-                $("#hh_final_ph").val( testSystems[i][3] );
-                $("#hh_final_conc").val( testSystems[i][4] );
-                $("#hh_final_vol").val( testSystems[i][5] );
-
-                // set pKa in the case of custom
-                testSystems[i][0] == "(custom)" && $("#hh_pka").val( parseFloat(testSystems[i][8]) );
+                $("#hh_input_ph").val( testSystems[i][3] );
+                $("#hh_input_conc").val( testSystems[i][4] );
+                $("#hh_input_vol").val( testSystems[i][5] );
+                $("#hh_input_pka").val( testSystems[i][8] );
 
                 // fire off calculation
                 $('#hh_run').trigger('click');
@@ -58,13 +54,9 @@
             }
 
             // clear out test residuals
-            $("#hh_acid_mw").val("");
-            $("#hh_base_mw").val("");
-            $("#hh_final_ph").val("");
-            $("#hh_final_conc").val("");
-            $("#hh_final_vol").val("");
-            $('#hh_req_acid_mass').val("")
-            $('#hh_req_base_mass').val("")
+            $("input[id^='hh_input_']").val("")
+
+            $("#buffer_system").val("Sodium phosphate");
 
         }
 
@@ -75,20 +67,14 @@
         function hendersonHasselbalch() {
             calc_acid = parseFloat( $("#hh_acid_mw").val() );
             calc_base = parseFloat( $("#hh_base_mw").val() );
-            desired_final_ph = parseFloat( $("#hh_final_ph").val() )
-            desired_final_conc = parseFloat( $("#hh_final_conc").val() )
-            desired_final_vol = parseFloat( $("#hh_final_vol").val() )
+            desired_final_ph = parseFloat( $("#hh_input_ph").val() )
+            desired_final_conc = parseFloat( $("#hh_input_conc").val() )
+            desired_final_vol = parseFloat( $("#hh_input_vol").val() )
 
             // Get pKa from bufferSystemAttributes using the name of the buffer system
             bufferSystemName = $("select#buffer_system").val()
 
-            if ( bufferSystemName == "(custom)" ) {
-                pKa = $("#hh_pka").val();
-            } else {
-                pKa = bufferSystemAttributes[bufferSystemName][0];
-            }
-
-            log( "pKa: " + pKa );
+            pKa = $("#hh_input_pka").val();
 
             // base / acid ratio = 10^(desired_final_ph - pKa)
             ratio_base_to_acid = Math.pow(10, desired_final_ph - pKa)
@@ -120,12 +106,12 @@
                 // wipe previous values
                 $('#hh_acid_mw').val('');
                 $('#hh_base_mw').val('');
-                $('#hh_pka').val('');
+                $('#hh_input_pka').val('');
 
                 // enable user input
                 $('#hh_acid_mw').prop('disabled', false);
                 $('#hh_base_mw').prop('disabled', false);
-                $('#hh_pka').prop('disabled', false);
+                $('#hh_input_pka').prop('disabled', false);
 
                 // disable the named buffers
                 $('#hh_acid').val("  (custom)  ");
@@ -141,7 +127,6 @@
                 // disable user input
                 $('#hh_acid_mw').prop('disabled', true);
                 $('#hh_base_mw').prop('disabled', true);
-                $('#hh_pka').prop('disabled', true);
 
             };
         }
@@ -161,7 +146,6 @@
                 $("#hh_base_mw").val(bufferSystemAttributes[bufferSystemName][5]);
                 $("#hh_base_mw_units").val(bufferSystemAttributes[bufferSystemName][6]);
 
-                $("#hh_pka").val(bufferSystemAttributes[bufferSystemName][0]);
             };
 
         }
@@ -223,8 +207,7 @@
             <option>(custom)</option>
             <option selected="selected">Sodium phosphate</option>
             <option>Tris</option>
-            <option>Ammonium acetate 1</option>
-            <option>Ammonium acetate 2</option>
+            <option>Ammonium acetate</option>
         </select>
         <br />
     </th>
@@ -277,19 +260,19 @@
     <td class="tg_calc">Enter your requirements:</td>
     <td class="tg_calc">
         pH: <br />
-        <input type="text" id="hh_final_ph">
+        <input type="text" id="hh_input_ph">
     </td>
     <td class="tg_calc">
         Concentration: <br />
-        <input type="text" id="hh_final_conc"> M
+        <input type="text" id="hh_input_conc"> M
     </td>
     <td class="tg_calc">
         Volume: <br />
-        <input type="text" id="hh_final_vol"> L
+        <input type="text" id="hh_input_vol"> L
     </td>
     <td class="tg_calc">
         pKa: <br />
-        <input type="text" id="hh_pka" value="6.82" disabled="disabled">
+        <input type="text" id="hh_input_pka">
     </td>
   </tr>
 
