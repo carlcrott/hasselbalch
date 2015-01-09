@@ -4,7 +4,7 @@
     <script>
 
         // change this to enable running test suite
-        var DEBUG=true;
+        var enableTestSuite = false;
 
         //// Buffer System Attributes:
         // Change these to update the values which are placed in the input boxes
@@ -23,17 +23,17 @@
         /////////////////////
 
         function runTestSuite(){
-            //                          buffer name          base Mw,   acid Mw,    pH,     conc,   vol,    acid out,   base out 
-            testTrisInputs            = ['Tris',             121.136,   157.591,    7,      1,      0.5,    '74.26',    '3.49'];
-            testSodiumPhosphateInputs = ['Sodium phosphate', 141.96,    119.98,     7.4,    1,      0.5,    '12.49',    '56.20'];
+            //                          buffer name          acid Mw,   base Mw,    pH,     conc,   vol,    acid out,   base out 
+            testTrisInputs            = ['Tris',             157.591,   121.136,    7,      1,      0.5,    '74.26',    '3.49'];
+            testSodiumPhosphateInputs = ['Sodium phosphate', 119.98,    141.96,     7.4,    1,      0.5,    '12.49',    '56.20'];
             testSystems = [testTrisInputs, testSodiumPhosphateInputs];
 
             for (i = 0; i < testSystems.length; i++) {
                 // select system
                 $("#buffer_system").val( testSystems[i][0] );
                 // input test values
-                $("#hh_base_mw").val( testSystems[i][1] );
-                $("#hh_acid_mw").val( testSystems[i][2] );
+                $("#hh_acid_mw").val( testSystems[i][1] );
+                $("#hh_base_mw").val( testSystems[i][2] );
                 $("#hh_final_ph").val( testSystems[i][3] );
                 $("#hh_final_conc").val( testSystems[i][4] );
                 $("#hh_final_vol").val( testSystems[i][5] );
@@ -45,12 +45,11 @@
                 } else {
                     console.log( "------------ " + testSystems[i][0] + " FAILED!" );
                 }
-
             }
 
-            // clear out test residual
-            $("#hh_base_mw").val("");
+            // clear out test residuals
             $("#hh_acid_mw").val("");
+            $("#hh_base_mw").val("");
             $("#hh_final_ph").val("");
             $("#hh_final_conc").val("");
             $("#hh_final_vol").val("");
@@ -64,8 +63,8 @@
         }
 
         function hendersonHasselbalch() {
-            calc_base = parseFloat( $("#hh_base_mw").val() );
             calc_acid = parseFloat( $("#hh_acid_mw").val() );
+            calc_base = parseFloat( $("#hh_base_mw").val() );
             desired_final_ph = parseFloat( $("#hh_final_ph").val() )
             desired_final_conc = parseFloat( $("#hh_final_conc").val() )
             desired_final_vol = parseFloat( $("#hh_final_vol").val() )
@@ -171,9 +170,11 @@
             $("#hh_run").on('click', hendersonHasselbalch );
 
             // If in debug mode show the button to run tests
-            if ( DEBUG ) {
+            if ( enableTestSuite == true ) {
                 $('#hh_run_tests').show();
                 $('#hh_run_tests').on('click', runTestSuite);
+            } else {
+                $('#hh_run_tests').hide();
             };
 
         });
@@ -191,9 +192,10 @@
             padding:10px 5px;
             text-align: center;
             border: 1px solid lightgrey;
-            overflow:hidden;word-break:normal;}
-        #hh_acid_mw_units_selector, #hh_base_mw_units_selector {display: none;};
-        #hh_run_tests {display: none;};
+            overflow: hidden;
+            word-break: normal;
+        }
+        #hh_acid_mw_units_selector, #hh_base_mw_units_selector { display: none;};
     </style>
 
 <head>
