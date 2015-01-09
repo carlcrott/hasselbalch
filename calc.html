@@ -8,11 +8,10 @@
 
         //// Buffer System Attributes:
         // Change these to update the values which are placed in the input boxes
-        // Values must match exact names in the buffer_system dropdown 
         var bufferSystemAttributes = {
-            "Sodium phosphate":     [6.82,   "NaH2PO4",       119.98,  "g/mol",   "Na2HPO4",      141.96,     "g/mol"],
-            "Tris":                 [8.214,  "Tris-HCl",      157.59,  "g/mol",   "Tris-OH",      121.136,    "g/mol"],
-            "Ammonium acetate":     [9.25,   "Acetic acid",   60.05,   "g/mol",   "NH4-acetate",  77.0825,    "g/mol"],
+            "Sodium phosphate":     ["NaH2PO4",       119.98,  "g/mol",   "Na2HPO4",      141.96,     "g/mol"],
+            "Tris":                 ["Tris-HCl",      157.59,  "g/mol",   "Tris-OH",      121.136,    "g/mol"],
+            "Ammonium acetate":     ["Acetic acid",   60.05,   "g/mol",   "NH4-acetate",  77.0825,    "g/mol"],
         }
 
         /////////////////////
@@ -54,9 +53,9 @@
             }
 
             // clear out test residuals
-            $("input[id^='hh_input_']").val("")
-
+            $("input[id^='hh_']").val("")
             $("#buffer_system").val("Sodium phosphate");
+            updateBufferSystemAttributes();
 
         }
 
@@ -71,7 +70,6 @@
             desired_final_conc = parseFloat( $("#hh_input_conc").val() )
             desired_final_vol = parseFloat( $("#hh_input_vol").val() )
 
-            // Get pKa from bufferSystemAttributes using the name of the buffer system
             bufferSystemName = $("select#buffer_system").val()
 
             pKa = $("#hh_input_pka").val();
@@ -138,13 +136,13 @@
             checkInputFieldPermissions();
 
             if ( bufferSystemName != "(custom)" ) {
-                $("#hh_acid").val(bufferSystemAttributes[bufferSystemName][1]);
-                $("#hh_acid_mw").val(bufferSystemAttributes[bufferSystemName][2]);
-                $("#hh_acid_mw_units").val(bufferSystemAttributes[bufferSystemName][3]);
+                $("#hh_acid").val(bufferSystemAttributes[bufferSystemName][0]);
+                $("#hh_acid_mw").val(bufferSystemAttributes[bufferSystemName][1]);
+                $("#hh_acid_mw_units").val(bufferSystemAttributes[bufferSystemName][2]);
 
-                $("#hh_base").val(bufferSystemAttributes[bufferSystemName][4]);
-                $("#hh_base_mw").val(bufferSystemAttributes[bufferSystemName][5]);
-                $("#hh_base_mw_units").val(bufferSystemAttributes[bufferSystemName][6]);
+                $("#hh_base").val(bufferSystemAttributes[bufferSystemName][3]);
+                $("#hh_base_mw").val(bufferSystemAttributes[bufferSystemName][4]);
+                $("#hh_base_mw_units").val(bufferSystemAttributes[bufferSystemName][5]);
 
             };
 
@@ -162,14 +160,23 @@
 
             // If in debug mode show the button to run tests
             if ( debugOn == true ) {
-                $('#hh_run_tests').show();
-                $('#hh_run_tests').on('click', runTestSuite);
+                $('#hh_run_tests').show().on('click', runTestSuite);
             } else {
                 $('#hh_run_tests').hide();
             };
 
-        });
+            // dynamically populate buffer system dropdown
+            $.each(bufferSystemAttributes, function(key, value) {
+                $('#buffer_system').append(
+                    $("<option></option>").text(key)
+                );
+            });
 
+            // set page default to first object in bufferSystemAttributes 
+            $('#buffer_system').val( Object.keys( bufferSystemAttributes )[0] )
+
+
+        });
 
     </script>
 
@@ -205,9 +212,6 @@
         buffer system: <br />
         <select id="buffer_system">
             <option>(custom)</option>
-            <option selected="selected">Sodium phosphate</option>
-            <option>Tris</option>
-            <option>Ammonium acetate</option>
         </select>
         <br />
     </th>
