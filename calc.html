@@ -3,18 +3,17 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
     <script>
 
-        // change this to enable running test suite
-        var debugOn = false;
-
         //// Buffer System Attributes:
         // Change these to update the values which are placed in the input boxes
-
-        var bufferSystemAttributes = {
         //  "System Name":          ["acid",          acid Mw,  "base",         base Mw]
+        var stockBufferSystems = {
             "Sodium phosphate":     ["NaH2PO4",       119.98,   "Na2HPO4",      141.96],
             "Tris":                 ["Tris-HCl",      157.59,   "Tris-OH",      121.136],
             "Ammonium acetate":     ["Acetic acid",   60.05,    "NH4-acetate",  77.0825],
         }
+
+        // change this to enable running test suite
+        var debugOn = true;
 
         /////////////////////
         //  Establish functions
@@ -57,14 +56,14 @@
             // clear out test residuals
             $("input[id^='hh_']").val("")
             $("#buffer_system").val("Sodium phosphate");
-            updateBufferSystemAttributes();
+            updateStockBufferSystems();
 
         }
 
-        // ensure bufferSystemAttributes is correctly formatted
-        function verifyBufferSystemFormatting( bufferSystemObj ){
-            $.each( bufferSystemObj, function(key, value) {
-                typeof( key ) == "string" ? "" : alert('bufferSystemAttributes key: ' + key + ' should be a string');
+        // ensure stockBufferSystems is correctly formatted
+        function verifyBufferSystemFormatting( obj ){
+            $.each( obj, function(key, value) {
+                typeof( key ) == "string" ? "" : alert('stockBufferSystems key: ' + key + ' should be a string');
                 typeof( value[0] ) == "string" ? "" : alert('The 1st entry in \"' + key + '\" should be a string');
                 typeof( value[1] ) == "number" ? "" : alert('The 2nd entry in \"' + key + '\" should be a number');
                 typeof( value[2] ) == "string" ? "" : alert('The 3rd entry in \"' + key + '\" should be a string');
@@ -144,18 +143,18 @@
             };
         }
 
-        function updateBufferSystemAttributes () {
+        function updateStockBufferSystems () {
             bufferSystemName = $("select#buffer_system").val()
             log(bufferSystemName);
 
             checkInputFieldPermissions();
 
             if ( bufferSystemName != "(custom)" ) {
-                $("#hh_acid").val(bufferSystemAttributes[bufferSystemName][0]);
-                $("#hh_acid_mw").val(bufferSystemAttributes[bufferSystemName][1]);
+                $("#hh_acid").val(stockBufferSystems[bufferSystemName][0]);
+                $("#hh_acid_mw").val(stockBufferSystems[bufferSystemName][1]);
 
-                $("#hh_base").val(bufferSystemAttributes[bufferSystemName][2]);
-                $("#hh_base_mw").val(bufferSystemAttributes[bufferSystemName][3]);
+                $("#hh_base").val(stockBufferSystems[bufferSystemName][2]);
+                $("#hh_base_mw").val(stockBufferSystems[bufferSystemName][3]);
 
             };
 
@@ -168,23 +167,23 @@
 
         $(document).ready(function() {
             // On changing the buffer system update the buffer attributes
-            $("#buffer_system").on('change', updateBufferSystemAttributes);
+            $("#buffer_system").on('change', updateStockBufferSystems);
             $("#hh_run").on('click', hendersonHasselbalch );
 
             // If in debug mode show the button to run tests
             debugOn && $('#hh_run_tests').show().on('click', runTestSuite);
 
-            verifyBufferSystemFormatting(bufferSystemAttributes);
+            verifyBufferSystemFormatting(stockBufferSystems);
 
             // dynamically populate buffer system dropdown
-            $.each(bufferSystemAttributes, function(key, value) {
+            $.each(stockBufferSystems, function(key, value) {
                 $('#buffer_system').append(
                     $("<option></option>").text(key)
                 );
             });
 
-            // set page default to first object in bufferSystemAttributes 
-            $('#buffer_system').val( Object.keys( bufferSystemAttributes )[0] )
+            // set page default to first object in stockBufferSystems 
+            $('#buffer_system').val( Object.keys( stockBufferSystems )[0] )
 
 
         });
