@@ -1,15 +1,16 @@
 <html>
 <head>
+    <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script> -->
     <script src="jquery.min.js"></script>
     <script>
 
         //// Buffer System Attributes:
         // Change these to update the values which are placed in the input boxes
-        //  "System Name":          ["acid",          acid Mw,  "base",         base Mw,    hydrateNum      ]
+        //  "System Name":          [pKa        "acid",          acid Mw,  "base",         base Mw,    hydrateNum      ]
         var stockBufferSystems = {
-            "Sodium phosphate":     ["NaH2PO4",       119.98,   "Na2HPO4",      141.96,     [0,2,7,8,12]    ],
-            "Tris":                 ["Tris-HCl",      157.59,   "Tris-OH",      121.136,    [0,30,60,90]    ],
-            "Ammonium acetate":     ["Acetic acid",   60.05,    "NH4-acetate",  77.0825,    [0,20,40,60,80] ],
+            "Sodium phosphate":     [6.82,      "NaH2PO4",       119.98,   "Na2HPO4",      141.96,     [0,2,7,8,12]    ],
+            "Tris":                 [8.214,     "Tris-HCl",      157.59,   "Tris-OH",      121.136,    [0,30,60,90]    ],
+            "Ammonium acetate":     [9.25,      "Acetic acid",   60.05,    "NH4-acetate",  77.0825,    [0,20,40,60,80] ],
         }
 
         // change this to enable running test suite
@@ -63,11 +64,12 @@
         // ensure stockBufferSystems is correctly formatted
         function verifyBufferSystemFormatting( obj ){
             $.each( obj, function(key, value) {
-                typeof( key ) == "string" ? "" : alert('stockBufferSystems key: ' + key + ' should be a string');
-                typeof( value[0] ) == "string" ? "" : alert('The 1st entry in \"' + key + '\" should be a string');
-                typeof( value[1] ) == "number" ? "" : alert('The 2nd entry in \"' + key + '\" should be a number');
-                typeof( value[2] ) == "string" ? "" : alert('The 3rd entry in \"' + key + '\" should be a string');
-                typeof( value[3] ) == "number" ? "" : alert('The 4th entry in \"' + key + '\" should be a number');
+                typeof( key )      == "string" ? "" : alert('stockBufferSystems key: ' + key + ' should be a string');
+                typeof( value[0] ) == "number" ? "" : alert('The 1st entry in \"' + key + '\" should be a number');
+                typeof( value[1] ) == "string" ? "" : alert('The 2st entry in \"' + key + '\" should be a string');
+                typeof( value[2] ) == "number" ? "" : alert('The 3nd entry in \"' + key + '\" should be a number');
+                typeof( value[3] ) == "string" ? "" : alert('The 4rd entry in \"' + key + '\" should be a string');
+                typeof( value[4] ) == "number" ? "" : alert('The 5th entry in \"' + key + '\" should be a number');
             });
             
             
@@ -84,6 +86,8 @@
             desired_final_conc = parseFloat( $("#hh_input_conc").val() )
             desired_final_vol = parseFloat( $("#hh_input_vol").val() )
             desired_final_pKa = $("#hh_input_pka").val();
+
+                    
 
             bufferSystemName = $("select#buffer_system").val()         
 
@@ -128,6 +132,10 @@
                 $('#hh_acid').val("  (custom)  ");
                 $('#hh_base').val("  (custom)  ");
 
+                // hide hydrates                
+                $("[id$='_hydrates_container']").hide();
+
+
             } else {
             //////
             // Runs when switching TO our stock buffer systems
@@ -138,6 +146,10 @@
                 // disable user input
                 $('#hh_acid_mw').prop('disabled', true);
                 $('#hh_base_mw').prop('disabled', true);
+                $('#hh_input_pka').prop('disabled', true);
+
+                // show hydrates                
+                $("[id$='_hydrates_container']").show();
 
             };
         }
@@ -153,23 +165,24 @@
                 // clear out existing options
                 $('#base_hydrates').empty();
 
-                for (i = 0; i < stockBufferSystems[bufferSystemName][4].length; i++) {
+                for (i = 0; i < stockBufferSystems[bufferSystemName][5].length; i++) {
+
                     $('#base_hydrates').append(
-                        $("<option></option>").text( stockBufferSystems[bufferSystemName][4][i] )
+                        $("<option></option>").text( stockBufferSystems[bufferSystemName][5][i] )
                     );
                 };
 
-                $("#hh_acid").val(stockBufferSystems[bufferSystemName][0]);
-                $("#hh_acid_mw").val(stockBufferSystems[bufferSystemName][1]);
-
-                $("#hh_base").val(stockBufferSystems[bufferSystemName][2]);
-                $("#hh_base_mw").val(stockBufferSystems[bufferSystemName][3]);
+                $("#hh_input_pka").val(stockBufferSystems[bufferSystemName][0]);
+                $("#hh_acid").val(stockBufferSystems[bufferSystemName][1]);
+                $("#hh_acid_mw").val(stockBufferSystems[bufferSystemName][2]);
+                $("#hh_base").val(stockBufferSystems[bufferSystemName][3]);
+                $("#hh_base_mw").val(stockBufferSystems[bufferSystemName][4]);
             };
         }
 
         function calculateHydratedMw() {
             // get anhydrous base Mw from buffer_system
-            anhydrousBaseMw = parseFloat( stockBufferSystems[ $('#buffer_system').val() ][3] )
+            anhydrousBaseMw = parseFloat( stockBufferSystems[ $('#buffer_system').val() ][4] )
 
             // calculate the modified hydrous value
             hydratedBaseMw = parseFloat($('#base_hydrates').val()) * 18;
@@ -215,6 +228,7 @@
         input[type="text"]{
             width:80px;
         }
+        .inline { display: inline-table; }
         .tg  {border-collapse:collapse;border-spacing:0;}
         .tg td, th {
             font-family:Arial, sans-serif;font-size:14px;font-weight:normal;
@@ -252,9 +266,15 @@
           Acid Name 
 ////////////////////////////////////// -->
 
-    <th class="tg_calc">
+    <th class="tg_calc" width="200px">
         acid:<br />
-        <input type="text" id="hh_acid" value="NaH2PO4" disabled="disabled"><br />
+        <input type="text" id="hh_acid" value="NaH2PO4" disabled="disabled" class="inline">
+            <div id="acid_hydrates_container" class="inline" >
+            &bull; 
+            <select id="acid_hydrates">
+            </select> H20
+        </div>
+        <br />
     </th>
 
 
@@ -273,13 +293,14 @@
           Base Name
 ////////////////////////////////////// -->
 
-    <th class="tg_calc">
+    <th class="tg_calc" width="200px">
         base:<br />
-        <input type="text" id="hh_base" value="NA2HPO4" disabled="disabled"> &bull; 
-        <select id="base_hydrates">
-            <option>0</option>
-            <option>1</option>
-        </select> H20
+        <input type="text" id="hh_base" value="NA2HPO4" disabled="disabled" class="inline"> 
+        <div id="base_hydrates_container" class="inline">
+            &bull; 
+            <select id="base_hydrates">
+            </select> H20
+        </div>
         <br />
     </th>
 
@@ -312,7 +333,7 @@
     </td>
     <td class="tg_calc">
         pKa: <br />
-        <input type="text" id="hh_input_pka">
+        <input type="text" id="hh_input_pka" disabled="disabled">
     </td>
   </tr>
 
