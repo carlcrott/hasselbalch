@@ -5,15 +5,15 @@
 
         //// Buffer System Attributes:
         // Change these to update the values which are placed in the input boxes
-        //  "System Name":          ["acid",          acid Mw,  "base",         base Mw]
+        //  "System Name":          ["acid",          acid Mw,  "base",         base Mw,    hydrateNum      ]
         var stockBufferSystems = {
-            "Sodium phosphate":     ["NaH2PO4",       119.98,   "Na2HPO4",      141.96],
-            "Tris":                 ["Tris-HCl",      157.59,   "Tris-OH",      121.136],
-            "Ammonium acetate":     ["Acetic acid",   60.05,    "NH4-acetate",  77.0825],
+            "Sodium phosphate":     ["NaH2PO4",       119.98,   "Na2HPO4",      141.96,     [0,2,7,8,12]    ],
+            "Tris":                 ["Tris-HCl",      157.59,   "Tris-OH",      121.136,    [0,30,60,90]    ],
+            "Ammonium acetate":     ["Acetic acid",   60.05,    "NH4-acetate",  77.0825,    [0,20,40,60,80] ],
         }
 
         // change this to enable running test suite
-        var debugOn = true;
+        var debugOn = false;
 
         /////////////////////
         //  Establish functions
@@ -83,13 +83,12 @@
             desired_final_ph = parseFloat( $("#hh_input_ph").val() )
             desired_final_conc = parseFloat( $("#hh_input_conc").val() )
             desired_final_vol = parseFloat( $("#hh_input_vol").val() )
+            desired_final_pKa = $("#hh_input_pka").val();
 
-            bufferSystemName = $("select#buffer_system").val()
-
-            pKa = $("#hh_input_pka").val();
+            bufferSystemName = $("select#buffer_system").val()         
 
             // base / acid ratio = 10^(desired_final_ph - pKa)
-            ratio_base_to_acid = Math.pow(10, desired_final_ph - pKa)
+            ratio_base_to_acid = Math.pow(10, desired_final_ph - desired_final_pKa)
             log( "ratio_base_to_acid: " + ratio_base_to_acid );
 
             // intermediates
@@ -104,7 +103,7 @@
             final_base_mass = intermediate_molar_base * calc_base * desired_final_vol
             log( "final_base_mass: " + final_base_mass );
 
-            // Write out required mass for
+            // Write out required mass for 
             $("#hh_req_acid_mass").val( final_acid_mass.toFixed(2) );
             $("#hh_req_base_mass").val( final_base_mass.toFixed(2) );
 
@@ -150,14 +149,33 @@
             checkInputFieldPermissions();
 
             if ( bufferSystemName != "(custom)" ) {
+
+                // clear out existing options
+                $('#base_hydrates').empty();
+
+                for (i = 0; i < stockBufferSystems[bufferSystemName][4].length; i++) {
+                    $('#base_hydrates').append(
+                        $("<option></option>").text( stockBufferSystems[bufferSystemName][4][i] )
+                    );
+                };
+
                 $("#hh_acid").val(stockBufferSystems[bufferSystemName][0]);
                 $("#hh_acid_mw").val(stockBufferSystems[bufferSystemName][1]);
 
                 $("#hh_base").val(stockBufferSystems[bufferSystemName][2]);
                 $("#hh_base_mw").val(stockBufferSystems[bufferSystemName][3]);
-
             };
+        }
 
+        function calculateHydratedMw() {
+            // get anhydrous base Mw from buffer_system
+            anhydrousBaseMw = parseFloat( stockBufferSystems[ $('#buffer_system').val() ][3] )
+
+            // calculate the modified hydrous value
+            hydratedBaseMw = parseFloat($('#base_hydrates').val()) * 18;
+
+            // replace base Mw with above value
+            $('#hh_base_mw').attr('value', parseFloat( anhydrousBaseMw + hydratedBaseMw ).toFixed(2) );
         }
 
 
@@ -182,9 +200,11 @@
                 );
             });
 
+            $('#base_hydrates').bind('change', calculateHydratedMw);
+
             // set page default to first object in stockBufferSystems 
             $('#buffer_system').val( Object.keys( stockBufferSystems )[0] )
-
+            updateStockBufferSystems();
 
         });
 
@@ -255,7 +275,12 @@
 
     <th class="tg_calc">
         base:<br />
-        <input type="text" id="hh_base" value="NA2HPO4" disabled="disabled"><br />
+        <input type="text" id="hh_base" value="NA2HPO4" disabled="disabled"> &bull; 
+        <select id="base_hydrates">
+            <option>0</option>
+            <option>1</option>
+        </select> H20
+        <br />
     </th>
 
 
