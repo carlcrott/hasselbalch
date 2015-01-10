@@ -6,15 +6,17 @@
 
         //// Buffer System Attributes:
         // Change these to update the values which are placed in the input boxes
-        //  "System Name":          [pKa        "acid",          acid Mw,  "base",         base Mw,    hydrateNum      ]
+        //  "System Name":          [pKa        "acid",          acid Mw,       baseHydrates,    "base",         base Mw,    baseHydrates      ]
         var stockBufferSystems = {
-            "Sodium phosphate":     [6.82,      "NaH2PO4",       119.98,   "Na2HPO4",      141.96,     [0,2,7,8,12]    ],
-            "Tris":                 [8.214,     "Tris-HCl",      157.59,   "Tris-OH",      121.136,    [0,30,60,90]    ],
-            "Ammonium acetate":     [9.25,      "Acetic acid",   60.05,    "NH4-acetate",  77.0825,    [0,20,40,60,80] ],
+            "Sodium phosphate":     [6.82,      "NaH2PO4",       119.98,        [0,2,7,8,12],     "Na2HPO4",      141.96,     [0,2,7,8,12]    ],
+            "Tris":                 [8.214,     "Tris-HCl",      157.59,        [0,30,60,90],     "Tris-OH",      121.136,    [0,30,60,90]    ],
+            "Ammonium acetate":     [9.25,      "Acetic acid",   60.05,         [0,20,40,60,80],  "NH4-acetate",  77.0825,    [0,20,40,60,80] ],
         }
 
         // change this to enable running test suite
         var debugOn = false;
+        var H2O_MOL_WEIGHT = 18;
+
 
         /////////////////////
         //  Establish functions
@@ -23,7 +25,7 @@
         // enable custom logging
         var log = function() { if (debugOn) { console.log(arguments) } };
 
-        function runTestSuite(){
+        function runTestSuite() {
             //   buffer name         acid Mw,   base Mw,    pH,     conc,   vol,    acid out,   base out,   pKa 
             testSystems = [
                 ['Tris',             157.591,   121.136,    7,      1,      0.5,    '74.26',    '3.49',     8.214],
@@ -31,7 +33,7 @@
                 ['(custom)',         60.05,     77.0825,    8.5,    1,      0.1,    '5.10',     '1.16',     9.25],    
             ];
 
-            for (i = 0; i < testSystems.length; i++) {
+            for ( i = 0; i < testSystems.length; i++ ) {
                 // select system
                 $("#buffer_system").val( testSystems[i][0] );
 
@@ -55,21 +57,24 @@
             }
 
             // clear out test residuals
-            $("input[id^='hh_']").val("")
+            $("input[id^='hh_']").val("");
             $("#buffer_system").val("Sodium phosphate");
             updateStockBufferSystems();
 
         }
 
         // ensure stockBufferSystems is correctly formatted
-        function verifyBufferSystemFormatting( obj ){
+        function verifyBufferSystemFormatting( obj ) {
             $.each( obj, function(key, value) {
+                // TODO: DRY
                 typeof( key )      == "string" ? "" : alert('stockBufferSystems key: ' + key + ' should be a string');
                 typeof( value[0] ) == "number" ? "" : alert('The 1st entry in \"' + key + '\" should be a number');
                 typeof( value[1] ) == "string" ? "" : alert('The 2st entry in \"' + key + '\" should be a string');
                 typeof( value[2] ) == "number" ? "" : alert('The 3nd entry in \"' + key + '\" should be a number');
-                typeof( value[3] ) == "string" ? "" : alert('The 4rd entry in \"' + key + '\" should be a string');
-                typeof( value[4] ) == "number" ? "" : alert('The 5th entry in \"' + key + '\" should be a number');
+                typeof( value[3] ) == "object" ? "" : alert('The 4rd entry in \"' + key + '\" should be an array');
+                typeof( value[4] ) == "string" ? "" : alert('The 5rd entry in \"' + key + '\" should be a sring');
+                typeof( value[5] ) == "number" ? "" : alert('The 6th entry in \"' + key + '\" should be a number');
+                typeof( value[6] ) == "object" ? "" : alert('The 7rd entry in \"' + key + '\" should be an array');
             });
             
             
@@ -154,7 +159,7 @@
             };
         }
 
-        function updateStockBufferSystems () {
+        function updateStockBufferSystems() {
             bufferSystemName = $("select#buffer_system").val()
             log(bufferSystemName);
 
@@ -162,31 +167,53 @@
 
             if ( bufferSystemName != "(custom)" ) {
 
-                // clear out existing options
-                $('#base_hydrates').empty();
+                // clear out existing hydrate numbers
+                $('[id$="_hydrates"').empty();
 
-                for (i = 0; i < stockBufferSystems[bufferSystemName][5].length; i++) {
 
+                // write in acid hydrates into dropdown
+                currentAcidHydrates = stockBufferSystems[bufferSystemName][3]
+                for (i = 0; i < currentAcidHydrates.length; i++) {
+                    $('#acid_hydrates').append(
+                        $("<option></option>").text( currentAcidHydrates[i] )
+                    );
+                };
+
+                // write in base hydrates into dropdown
+                currentBaseHydrates = stockBufferSystems[bufferSystemName][6]
+                for (i = 0; i < currentBaseHydrates.length; i++) {
                     $('#base_hydrates').append(
-                        $("<option></option>").text( stockBufferSystems[bufferSystemName][5][i] )
+                        $("<option></option>").text( currentBaseHydrates[i] )
                     );
                 };
 
                 $("#hh_input_pka").val(stockBufferSystems[bufferSystemName][0]);
+                
                 $("#hh_acid").val(stockBufferSystems[bufferSystemName][1]);
                 $("#hh_acid_mw").val(stockBufferSystems[bufferSystemName][2]);
-                $("#hh_base").val(stockBufferSystems[bufferSystemName][3]);
-                $("#hh_base_mw").val(stockBufferSystems[bufferSystemName][4]);
+
+                $("#hh_base").val(stockBufferSystems[bufferSystemName][4]);
+                $("#hh_base_mw").val(stockBufferSystems[bufferSystemName][5]);
             };
         }
 
         function calculateHydratedMw() {
+            currentBufferSystem = $('#buffer_system').val();
+
+            //// Acid hydration calcs            
             // get anhydrous base Mw from buffer_system
-            anhydrousBaseMw = parseFloat( stockBufferSystems[ $('#buffer_system').val() ][4] )
-
+            anhydrousAcidMw = parseFloat( stockBufferSystems[ currentBufferSystem ][2] )
             // calculate the modified hydrous value
-            hydratedBaseMw = parseFloat($('#base_hydrates').val()) * 18;
+            hydratedAcidMw = parseFloat($('#acid_hydrates').val()) * H2O_MOL_WEIGHT;
+            // replace base Mw with above value
+            $('#hh_acid_mw').attr('value', parseFloat( anhydrousAcidMw + hydratedAcidMw ).toFixed(2) );
 
+
+            //// Base hydration calcs
+            // get anhydrous base Mw from buffer_system
+            anhydrousBaseMw = parseFloat( stockBufferSystems[ currentBufferSystem ][5] )
+            // calculate the modified hydrous value
+            hydratedBaseMw = parseFloat($('#base_hydrates').val()) * H2O_MOL_WEIGHT;
             // replace base Mw with above value
             $('#hh_base_mw').attr('value', parseFloat( anhydrousBaseMw + hydratedBaseMw ).toFixed(2) );
         }
@@ -213,7 +240,7 @@
                 );
             });
 
-            $('#base_hydrates').bind('change', calculateHydratedMw);
+            $('[id$="_hydrates"]').bind('change', calculateHydratedMw);
 
             // set page default to first object in stockBufferSystems 
             $('#buffer_system').val( Object.keys( stockBufferSystems )[0] )
@@ -224,12 +251,10 @@
     </script>
 
     <style type="text/css">
-        .tg_calc {padding:10px 15px;}
-        input[type="text"]{
-            width:80px;
-        }
+        .tg_calc { padding:10px 15px; }
+        input[type="text"]{ width:80px; }
         .inline { display: inline-table; }
-        .tg  {border-collapse:collapse;border-spacing:0;}
+        .tg  { border-collapse:collapse;border-spacing:0; }
         .tg td, th {
             font-family:Arial, sans-serif;font-size:14px;font-weight:normal;
             padding:10px 5px;
@@ -238,7 +263,7 @@
             overflow: hidden;
             word-break: normal;
         }
-        #hh_run_tests { display: none;};
+        #hh_run_tests { display: none; };
     </style>
 
 <head>
