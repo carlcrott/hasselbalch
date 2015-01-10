@@ -68,16 +68,14 @@
             $.each( obj, function(key, value) {
                 // TODO: DRY
                 typeof( key )      == "string" ? "" : alert('stockBufferSystems key: ' + key + ' should be a string');
-                typeof( value[0] ) == "number" ? "" : alert('The 1st entry in \"' + key + '\" should be a number');
-                typeof( value[1] ) == "string" ? "" : alert('The 2st entry in \"' + key + '\" should be a string');
-                typeof( value[2] ) == "number" ? "" : alert('The 3nd entry in \"' + key + '\" should be a number');
-                typeof( value[3] ) == "object" ? "" : alert('The 4rd entry in \"' + key + '\" should be an array');
-                typeof( value[4] ) == "string" ? "" : alert('The 5rd entry in \"' + key + '\" should be a sring');
-                typeof( value[5] ) == "number" ? "" : alert('The 6th entry in \"' + key + '\" should be a number');
-                typeof( value[6] ) == "object" ? "" : alert('The 7rd entry in \"' + key + '\" should be an array');
-            });
-            
-            
+                typeof( value[0] ) == "number" ? "" : alert('entry 1 in \"' + key + '\" should be a number');
+                typeof( value[1] ) == "string" ? "" : alert('entry 2 in \"' + key + '\" should be a string');
+                typeof( value[2] ) == "number" ? "" : alert('entry 3 in \"' + key + '\" should be a number');
+                typeof( value[3] ) == "object" ? "" : alert('entry 4 in \"' + key + '\" should be an array');
+                typeof( value[4] ) == "string" ? "" : alert('entry 5 in \"' + key + '\" should be a string');
+                typeof( value[5] ) == "number" ? "" : alert('entry 6 in \"' + key + '\" should be a number');
+                typeof( value[6] ) == "object" ? "" : alert('entry 7 in \"' + key + '\" should be an array');
+            });            
         }
 
         function log10(val) {
@@ -91,8 +89,6 @@
             desired_final_conc = parseFloat( $("#hh_input_conc").val() )
             desired_final_vol = parseFloat( $("#hh_input_vol").val() )
             desired_final_pKa = $("#hh_input_pka").val();
-
-                    
 
             bufferSystemName = $("select#buffer_system").val()         
 
@@ -115,7 +111,6 @@
             // Write out required mass for 
             $("#hh_req_acid_mass").val( final_acid_mass.toFixed(2) );
             $("#hh_req_base_mass").val( final_base_mass.toFixed(2) );
-
         }
 
         function checkInputFieldPermissions() {
@@ -139,7 +134,6 @@
 
                 // hide hydrates                
                 $("[id$='_hydrates_container']").hide();
-
 
             } else {
             //////
@@ -170,7 +164,6 @@
                 // clear out existing hydrate numbers
                 $('[id$="_hydrates"').empty();
 
-
                 // write in acid hydrates into dropdown
                 currentAcidHydrates = stockBufferSystems[bufferSystemName][3]
                 for (i = 0; i < currentAcidHydrates.length; i++) {
@@ -197,25 +190,25 @@
             };
         }
 
-        function calculateHydratedMw() {
-            currentBufferSystem = $('#buffer_system').val();
 
-            //// Acid hydration calcs            
+        function calculateHydratedAcidMw() {
+            currentBufferSystem = $('#buffer_system').val();
             // get anhydrous base Mw from buffer_system
             anhydrousAcidMw = parseFloat( stockBufferSystems[ currentBufferSystem ][2] )
             // calculate the modified hydrous value
             hydratedAcidMw = parseFloat($('#acid_hydrates').val()) * H2O_MOL_WEIGHT;
             // replace base Mw with above value
-            $('#hh_acid_mw').attr('value', parseFloat( anhydrousAcidMw + hydratedAcidMw ).toFixed(2) );
+            $('#hh_acid_mw').attr('value', parseFloat( anhydrousAcidMw + hydratedAcidMw ).toFixed(3) );
+        }            
 
-
-            //// Base hydration calcs
+        function calculateHydratedBaseMw() {
+            currentBufferSystem = $('#buffer_system').val();
             // get anhydrous base Mw from buffer_system
             anhydrousBaseMw = parseFloat( stockBufferSystems[ currentBufferSystem ][5] )
             // calculate the modified hydrous value
             hydratedBaseMw = parseFloat($('#base_hydrates').val()) * H2O_MOL_WEIGHT;
             // replace base Mw with above value
-            $('#hh_base_mw').attr('value', parseFloat( anhydrousBaseMw + hydratedBaseMw ).toFixed(2) );
+            $('#hh_base_mw').attr('value', parseFloat( anhydrousBaseMw + hydratedBaseMw ).toFixed(3) );
         }
 
 
@@ -240,7 +233,8 @@
                 );
             });
 
-            $('[id$="_hydrates"]').bind('change', calculateHydratedMw);
+            $('#acid_hydrates').bind('change', calculateHydratedAcidMw);
+            $('#base_hydrates').bind('change', calculateHydratedBaseMw);
 
             // set page default to first object in stockBufferSystems 
             $('#buffer_system').val( Object.keys( stockBufferSystems )[0] )
