@@ -132,8 +132,8 @@
                 $('#hh_acid').val("  (custom)  ");
                 $('#hh_base').val("  (custom)  ");
 
-                // hide hydrates                
-                $("[id$='_hydrates_container']").hide();
+                // show hydrates                
+                $('#acid_hydrates, #base_hydrates').hide();
 
             } else {
             //////
@@ -148,7 +148,7 @@
                 $('#hh_input_pka').prop('disabled', true);
 
                 // show hydrates                
-                $("[id$='_hydrates_container']").show();
+                $('#acid_hydrates, #base_hydrates').show();
 
             };
         }
@@ -162,7 +162,7 @@
             if ( bufferSystemName != "(custom)" ) {
 
                 // clear out existing hydrate numbers
-                $('[id$="_hydrates"').empty();
+                $('#acid_hydrates, #base_hydrates').empty();
 
                 // write in acid hydrates into dropdown
                 currentAcidHydrates = stockBufferSystems[bufferSystemName][3]
@@ -221,7 +221,7 @@
                 );
             });
 
-            $('[id$="_hydrates"]').bind('change', calculateHydratedCompoundMw);
+            $('#acid_hydrates, #base_hydrates').bind('change', calculateHydratedCompoundMw);
 
             // set page default to first object in stockBufferSystems 
             $('#buffer_system').val( Object.keys( stockBufferSystems )[0] )
@@ -276,7 +276,7 @@
         acid:<br />
         <input type="text" id="hh_acid" value="NaH2PO4" disabled="disabled" class="inline">
             <div id="acid_hydrates_container" class="inline" >
-            &bull; 
+            &bull;&nbsp;
             <select id="acid_hydrates">
             </select> H20
         </div>
@@ -303,7 +303,7 @@
         base:<br />
         <input type="text" id="hh_base" value="NA2HPO4" disabled="disabled" class="inline"> 
         <div id="base_hydrates_container" class="inline">
-            &bull; 
+            &bull;&nbsp;
             <select id="base_hydrates">
             </select> H20
         </div>
