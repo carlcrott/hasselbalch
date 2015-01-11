@@ -97,15 +97,15 @@
             log( "ratio_base_to_acid: " + ratio_base_to_acid );
 
             // intermediates
-            intermediate_molar_acid = desired_final_conc / ( 1 +  ratio_base_to_acid )
+            intermediate_molar_acid = desired_final_conc / ( 1 +  ratio_base_to_acid );
             log( "intermediate_molar_acid: " + intermediate_molar_acid );
-            intermediate_molar_base = desired_final_conc - intermediate_molar_acid
+            intermediate_molar_base = desired_final_conc - intermediate_molar_acid;
             log( "intermediate_molar_base: " + intermediate_molar_base );
 
             // final
-            final_acid_mass = intermediate_molar_acid * calc_acid * desired_final_vol
+            final_acid_mass = intermediate_molar_acid * calc_acid * desired_final_vol;
             log( "final_acid_mass: " + final_acid_mass );
-            final_base_mass = intermediate_molar_base * calc_base * desired_final_vol
+            final_base_mass = intermediate_molar_base * calc_base * desired_final_vol;
             log( "final_base_mass: " + final_base_mass );
 
             // Write out required mass for 
@@ -154,7 +154,7 @@
         }
 
         function updateStockBufferSystems() {
-            bufferSystemName = $("select#buffer_system").val()
+            bufferSystemName = $("select#buffer_system").val();
             log(bufferSystemName);
 
             checkInputFieldPermissions();
@@ -165,7 +165,7 @@
                 $('#acid_hydrates, #base_hydrates').empty();
 
                 // write in acid hydrates into dropdown
-                currentAcidHydrates = stockBufferSystems[bufferSystemName][3]
+                currentAcidHydrates = stockBufferSystems[bufferSystemName][3];
                 for (i = 0; i < currentAcidHydrates.length; i++) {
                     $('#acid_hydrates').append(
                         $("<option></option>").text( currentAcidHydrates[i] )
@@ -173,7 +173,7 @@
                 };
 
                 // write in base hydrates into dropdown
-                currentBaseHydrates = stockBufferSystems[bufferSystemName][6]
+                currentBaseHydrates = stockBufferSystems[bufferSystemName][6];
                 for (i = 0; i < currentBaseHydrates.length; i++) {
                     $('#base_hydrates').append(
                         $("<option></option>").text( currentBaseHydrates[i] )
@@ -224,7 +224,7 @@
             $('#acid_hydrates, #base_hydrates').bind('change', calculateHydratedCompoundMw);
 
             // set page default to first object in stockBufferSystems 
-            $('#buffer_system').val( Object.keys( stockBufferSystems )[0] )
+            $('#buffer_system').val( Object.keys( stockBufferSystems )[0] );
             updateStockBufferSystems();
 
         });
