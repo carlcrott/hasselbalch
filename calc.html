@@ -190,27 +190,15 @@
             };
         }
 
-
-        function calculateHydratedAcidMw() {
+        function calculateHydratedCompoundMw() {
             currentBufferSystem = $('#buffer_system').val();
-            // get anhydrous base Mw from buffer_system
-            anhydrousAcidMw = parseFloat( stockBufferSystems[ currentBufferSystem ][2] )
+            // get anhydrous compound Mw from buffer_system
+            anhydrousMw = parseFloat( stockBufferSystems[ currentBufferSystem ][2] );
             // calculate the modified hydrous value
-            hydratedAcidMw = parseFloat($('#acid_hydrates').val()) * H2O_MOL_WEIGHT;
-            // replace base Mw with above value
-            $('#hh_acid_mw').attr('value', parseFloat( anhydrousAcidMw + hydratedAcidMw ).toFixed(3) );
-        }            
-
-        function calculateHydratedBaseMw() {
-            currentBufferSystem = $('#buffer_system').val();
-            // get anhydrous base Mw from buffer_system
-            anhydrousBaseMw = parseFloat( stockBufferSystems[ currentBufferSystem ][5] )
-            // calculate the modified hydrous value
-            hydratedBaseMw = parseFloat($('#base_hydrates').val()) * H2O_MOL_WEIGHT;
-            // replace base Mw with above value
-            $('#hh_base_mw').attr('value', parseFloat( anhydrousBaseMw + hydratedBaseMw ).toFixed(3) );
+            addHydratedMw = parseFloat( $(this).val() ) * H2O_MOL_WEIGHT;
+            // replace compound Mw with above value
+            $('#hh_' + $(this).attr("id").split("_")[0] + '_mw').attr('value', parseFloat( anhydrousMw + addHydratedMw ).toFixed(3) );
         }
-
 
         /////////////////////
         //  Actual page binding 
@@ -233,8 +221,7 @@
                 );
             });
 
-            $('#acid_hydrates').bind('change', calculateHydratedAcidMw);
-            $('#base_hydrates').bind('change', calculateHydratedBaseMw);
+            $('[id$="_hydrates"]').bind('change', calculateHydratedCompoundMw);
 
             // set page default to first object in stockBufferSystems 
             $('#buffer_system').val( Object.keys( stockBufferSystems )[0] )
