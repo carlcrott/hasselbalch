@@ -5,10 +5,13 @@
 // <![CDATA[
 
 var hhScript = function($){
+// Henderson & Hasselbalch Calculator: Carl Crott <carlcrott@gmail.com>
 
-    //// Buffer System Attributes:
-    // Change these to update the values which are placed in the input boxes
+
+    //// Buffer System Dropdown:
     //  "System Name":          [pKa        "acid",          acid Mw,       baseHydrates,    "base",         base Mw,    baseHydrates      ]
+    //     "string"             [num        "string"         num            array            "string"        num         array             ]
+
     var stockBufferSystems = {
         "Sodium phosphate":     [6.82,      "NaH2PO4",       119.98,        [0,2,7,8,12],     "Na2HPO4",      141.96,     [0,2,7,8,12]    ],
         "Tris":                 [8.214,     "Tris-HCl",      157.59,        [0,30,60,90],     "Tris-OH",      121.136,    [0,30,60,90]    ],
@@ -26,44 +29,6 @@ var hhScript = function($){
 
     // enable custom logging
     var log = function() { if (debugOn) { console.log(arguments) } };
-
-    function testMaths() {
-        //   buffer name         acid Mw,   base Mw,    pH,     conc,   vol,    acid out,   base out,   pKa 
-        testSystems = [
-            ['Tris',             157.591,   121.136,    7,      1,      0.5,    '74.26',    '3.49',     8.214],
-            ['Sodium phosphate', 119.98,    141.96,     7.4,    1,      0.5,    '12.49',    '56.20',    6.82],
-            ['(custom)',         60.05,     77.0825,    8.5,    1,      0.1,    '5.10',     '1.16',     9.25],    
-        ];
-
-        for ( i = 0; i < testSystems.length; i++ ) {
-            // select system
-            $("#buffer_system").val( testSystems[i][0] );
-
-            // input test values
-            $("#hh_acid_mw").val( testSystems[i][1] );
-            $("#hh_base_mw").val( testSystems[i][2] );
-            $("#hh_input_ph").val( testSystems[i][3] );
-            $("#hh_input_conc").val( testSystems[i][4] );
-            $("#hh_input_vol").val( testSystems[i][5] );
-            $("#hh_input_pka").val( testSystems[i][8] );
-
-            // fire off calculation
-            $('#hh_run').trigger('click');
-
-            // verify outputs
-            if ( $('#hh_req_acid_mass').val() == testSystems[i][6] && $('#hh_req_base_mass').val() == testSystems[i][7] ){
-                console.log( "------------ " + testSystems[i][0] + " PASSED!" );
-            } else {
-                console.log( "------------ " + testSystems[i][0] + " FAILED!" );
-            }
-        }
-
-        // clear out test residuals
-        $("input[id^='hh_']").val("");
-        $("#buffer_system").val("Sodium phosphate");
-        updateStockBufferSystems();
-
-    }
 
     // ensure stockBufferSystems is correctly formatted
     function verifyBufferSystemFormatting( obj ) {
@@ -113,6 +78,44 @@ var hhScript = function($){
         // Write out required mass for 
         $("#hh_req_acid_mass").val( final_acid_mass.toFixed(2) );
         $("#hh_req_base_mass").val( final_base_mass.toFixed(2) );
+    }
+
+    function testMaths() {
+        //   buffer name         acid Mw,   base Mw,    pH,     conc,   vol,    acid out,   base out,   pKa 
+        testSystems = [
+            ['Tris',             157.591,   121.136,    7,      1,      0.5,    '74.26',    '3.49',     8.214],
+            ['Sodium phosphate', 119.98,    141.96,     7.4,    1,      0.5,    '12.49',    '56.20',    6.82],
+            ['(custom)',         60.05,     77.0825,    8.5,    1,      0.1,    '5.10',     '1.16',     9.25],    
+        ];
+
+        for ( i = 0; i < testSystems.length; i++ ) {
+            // select system
+            $("#buffer_system").val( testSystems[i][0] );
+
+            // input test values
+            $("#hh_acid_mw").val( testSystems[i][1] );
+            $("#hh_base_mw").val( testSystems[i][2] );
+            $("#hh_input_ph").val( testSystems[i][3] );
+            $("#hh_input_conc").val( testSystems[i][4] );
+            $("#hh_input_vol").val( testSystems[i][5] );
+            $("#hh_input_pka").val( testSystems[i][8] );
+
+            // fire off calculation
+            $('#hh_run').trigger('click');
+
+            // verify outputs
+            if ( $('#hh_req_acid_mass').val() == testSystems[i][6] && $('#hh_req_base_mass').val() == testSystems[i][7] ){
+                console.log( "------------ " + testSystems[i][0] + " PASSED!" );
+            } else {
+                console.log( "------------ " + testSystems[i][0] + " FAILED!" );
+            }
+        }
+
+        // clear out test residuals
+        $("input[id^='hh_']").val("");
+        $("#buffer_system").val("Sodium phosphate");
+        updateStockBufferSystems();
+
     }
 
     function checkInputFieldPermissions() {

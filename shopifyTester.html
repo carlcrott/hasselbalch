@@ -4,66 +4,31 @@
 <script>
 // <![CDATA[
 
-//// Buffer System Attributes:
-// Change these to update the values which are placed in the input boxes
-//  "System Name":          [pKa        "acid",          acid Mw,       baseHydrates,    "base",         base Mw,    baseHydrates      ]
-var stockBufferSystems = {
-    "Sodium phosphate":     [6.82,      "NaH2PO4",       119.98,        [0,2,7,8,12],     "Na2HPO4",      141.96,     [0,2,7,8,12]    ],
-    "Tris":                 [8.214,     "Tris-HCl",      157.59,        [0,30,60,90],     "Tris-OH",      121.136,    [0,30,60,90]    ],
-    "Ammonium acetate":     [9.25,      "Acetic acid",   60.05,         [0,20,40,60,80],  "NH4-acetate",  77.0825,    [0,20,40,60,80] ],
-}
-
-// change this to enable running test suite
-var debugOn = false;
-var H2O_MOL_WEIGHT = 18;
-
-
-/////////////////////
-//  Establish functions
-/////////////////////
-
 var hhScript = function($){
+// Henderson & Hasselbalch Calculator: Carl Crott <carlcrott@gmail.com>
+
+
+    //// Buffer System Dropdown:
+    //  "System Name":          [pKa        "acid",          acid Mw,       baseHydrates,    "base",         base Mw,    baseHydrates      ]
+    //     "string"             [num        "string"         num            array            "string"        num         array             ]
+
+    var stockBufferSystems = {
+        "Sodium phosphate":     [6.82,      "NaH2PO4",       119.98,        [0,2,7,8,12],     "Na2HPO4",      141.96,     [0,2,7,8,12]    ],
+        "Tris":                 [8.214,     "Tris-HCl",      157.59,        [0,30,60,90],     "Tris-OH",      121.136,    [0,30,60,90]    ],
+        "Ammonium acetate":     [9.25,      "Acetic acid",   60.05,         [0,20,40,60,80],  "NH4-acetate",  77.0825,    [0,20,40,60,80] ],
+    }
+
+    // change this to enable running test suite
+    var debugOn = false;
+    var H2O_MOL_WEIGHT = 18;
+
+
+    /////////////////////
+    //  Establish functions
+    /////////////////////
 
     // enable custom logging
     var log = function() { if (debugOn) { console.log(arguments) } };
-
-    function testMaths() {
-        //   buffer name         acid Mw,   base Mw,    pH,     conc,   vol,    acid out,   base out,   pKa 
-        testSystems = [
-            ['Tris',             157.591,   121.136,    7,      1,      0.5,    '74.26',    '3.49',     8.214],
-            ['Sodium phosphate', 119.98,    141.96,     7.4,    1,      0.5,    '12.49',    '56.20',    6.82],
-            ['(custom)',         60.05,     77.0825,    8.5,    1,      0.1,    '5.10',     '1.16',     9.25],    
-        ];
-
-        for ( i = 0; i < testSystems.length; i++ ) {
-            // select system
-            $("#buffer_system").val( testSystems[i][0] );
-
-            // input test values
-            $("#hh_acid_mw").val( testSystems[i][1] );
-            $("#hh_base_mw").val( testSystems[i][2] );
-            $("#hh_input_ph").val( testSystems[i][3] );
-            $("#hh_input_conc").val( testSystems[i][4] );
-            $("#hh_input_vol").val( testSystems[i][5] );
-            $("#hh_input_pka").val( testSystems[i][8] );
-
-            // fire off calculation
-            $('#hh_run').trigger('click');
-
-            // verify outputs
-            if ( $('#hh_req_acid_mass').val() == testSystems[i][6] && $('#hh_req_base_mass').val() == testSystems[i][7] ){
-                console.log( "------------ " + testSystems[i][0] + " PASSED!" );
-            } else {
-                console.log( "------------ " + testSystems[i][0] + " FAILED!" );
-            }
-        }
-
-        // clear out test residuals
-        $("input[id^='hh_']").val("");
-        $("#buffer_system").val("Sodium phosphate");
-        updateStockBufferSystems();
-
-    }
 
     // ensure stockBufferSystems is correctly formatted
     function verifyBufferSystemFormatting( obj ) {
@@ -113,6 +78,44 @@ var hhScript = function($){
         // Write out required mass for 
         $("#hh_req_acid_mass").val( final_acid_mass.toFixed(2) );
         $("#hh_req_base_mass").val( final_base_mass.toFixed(2) );
+    }
+
+    function testMaths() {
+        //   buffer name         acid Mw,   base Mw,    pH,     conc,   vol,    acid out,   base out,   pKa 
+        testSystems = [
+            ['Tris',             157.591,   121.136,    7,      1,      0.5,    '74.26',    '3.49',     8.214],
+            ['Sodium phosphate', 119.98,    141.96,     7.4,    1,      0.5,    '12.49',    '56.20',    6.82],
+            ['(custom)',         60.05,     77.0825,    8.5,    1,      0.1,    '5.10',     '1.16',     9.25],    
+        ];
+
+        for ( i = 0; i < testSystems.length; i++ ) {
+            // select system
+            $("#buffer_system").val( testSystems[i][0] );
+
+            // input test values
+            $("#hh_acid_mw").val( testSystems[i][1] );
+            $("#hh_base_mw").val( testSystems[i][2] );
+            $("#hh_input_ph").val( testSystems[i][3] );
+            $("#hh_input_conc").val( testSystems[i][4] );
+            $("#hh_input_vol").val( testSystems[i][5] );
+            $("#hh_input_pka").val( testSystems[i][8] );
+
+            // fire off calculation
+            $('#hh_run').trigger('click');
+
+            // verify outputs
+            if ( $('#hh_req_acid_mass').val() == testSystems[i][6] && $('#hh_req_base_mass').val() == testSystems[i][7] ){
+                console.log( "------------ " + testSystems[i][0] + " PASSED!" );
+            } else {
+                console.log( "------------ " + testSystems[i][0] + " FAILED!" );
+            }
+        }
+
+        // clear out test residuals
+        $("input[id^='hh_']").val("");
+        $("#buffer_system").val("Sodium phosphate");
+        updateStockBufferSystems();
+
     }
 
     function checkInputFieldPermissions() {
@@ -202,6 +205,37 @@ var hhScript = function($){
         $('#hh_' + $(this).attr("id").split("_")[0] + '_mw').val( parseFloat( anhydrousMw + addHydratedMw ).toFixed(3) );
     }
 
+
+    /////////////////////
+    //  Actual page binding 
+    /////////////////////
+
+    $(document).ready(function() {
+        // On changing the buffer system update the buffer attributes
+        $("#buffer_system").on('change', updateStockBufferSystems);
+        $("#hh_run").on('click', hendersonHasselbalch );
+
+        // If in debug mode show the button to run tests
+        debugOn && $('#hh_run_tests').show().on('click', testMaths);
+
+        verifyBufferSystemFormatting(stockBufferSystems);
+
+        // dynamically populate buffer system dropdown
+        $.each(stockBufferSystems, function(key, value) {
+            $('#buffer_system').append(
+                $("<option></option>").text(key)
+            );
+        });
+
+        $('#acid_hydrates').bind('change', calculateHydratedCompoundMw);
+        $('#base_hydrates').bind('change', calculateHydratedCompoundMw);
+
+        // set page default to first object in stockBufferSystems 
+        $('#buffer_system').val( Object.keys( stockBufferSystems )[0] );
+        updateStockBufferSystems();
+
+        $('body').append('<p>Your app is using jQuery version '+$.fn.jquery+'</p>');
+
     }); // end  $(document).ready(function() {
 
 
@@ -241,35 +275,6 @@ if ((typeof jQuery === 'undefined') || (parseFloat(jQuery.fn.jquery) < 1.7)) {
 } else {
   hhScript(jQuery);
 }
-
-/////////////////////
-//  Actual page binding 
-/////////////////////
-
-$(document).ready(function() {
-    // On changing the buffer system update the buffer attributes
-    $("#buffer_system").on('change', updateStockBufferSystems);
-    $("#hh_run").on('click', hendersonHasselbalch );
-
-    // If in debug mode show the button to run tests
-    debugOn && $('#hh_run_tests').show().on('click', testMaths);
-
-    verifyBufferSystemFormatting(stockBufferSystems);
-
-    // dynamically populate buffer system dropdown
-    $.each(stockBufferSystems, function(key, value) {
-        $('#buffer_system').append(
-            $("<option></option>").text(key)
-        );
-    });
-
-    $('#acid_hydrates').bind('change', calculateHydratedCompoundMw);
-    $('#base_hydrates').bind('change', calculateHydratedCompoundMw);
-
-    // set page default to first object in stockBufferSystems 
-    $('#buffer_system').val( Object.keys( stockBufferSystems )[0] );
-    updateStockBufferSystems();
-
 
 // ]]>
 
